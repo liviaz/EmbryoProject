@@ -11,7 +11,6 @@ library(GO.db)
 library(Homo.sapiens)
 library(goseq)
 library(rtracklayer)
-#library(GenomicRanges)
 library(ape)
 library(rgl)
 library(reshape2)
@@ -26,10 +25,10 @@ library(clValid)
 
 if (Sys.info()["sysname"] == "Linux") {
   source("/host/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/HTSeq_Count_Out"
+  baseDataDirectory <- "/host/Users/Livia/Desktop/liviaz4189@gmail.com/Processed Data"
 } else {
   source("C:/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/HTSeq_Count_Out"
+  baseDataDirectory <- "C:/Users/Livia/Desktop/liviaz4189@gmail.com/Processed Data"
 }
 
 

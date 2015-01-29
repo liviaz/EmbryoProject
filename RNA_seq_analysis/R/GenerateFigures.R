@@ -4,19 +4,9 @@ rm(list = ls())
 
 
 if (Sys.info()["sysname"] == "Linux") {
-  source("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/LoadHTSeqCountData_Human_HiSeq.R")
-  # read in RPKM data
-  conditionCombined = c(condition, 5,5,5)
-  allRPKM = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/allHumanEmbryoRPKM.txt")
-  #yanData = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/Yan2013.csv", header = TRUE, row.names = 1)
-  combinedRPKMtable = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/combinedEmbryoRPKM.txt")
+  source("/host/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/LoadHTSeqCountData_Human_HiSeq.R")
 } else {
-  source("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/LoadHTSeqCountData_Human_HiSeq.R")
-  # read in RPKM data
-  conditionCombined = c(condition, 5,5,5)
-  allRPKM = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/allHumanEmbryoRPKM.txt")
-  #yanData = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/Yan2013.csv", header = TRUE, row.names = 1)
-  combinedRPKMtable = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/combinedEmbryoRPKM.txt")
+  source("C:/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/LoadHTSeqCountData_Human_HiSeq.R")
 }
 
 
@@ -28,7 +18,7 @@ n1 = c(.9846, .6002, .2841, .9604, .9848, .5634, .6229, .5988, .5586, .5216, 1.5
 embryosSamePatient = c(3,4,6,7,8,10,11,12,13,14,15,16,17,18,20,21,22)
 
 
-combat.edata = read.table(paste(baseDataDirectory, "/edgeR/ComBat_SVA/combat_edata.txt", sep = ""))
+combat.edata = read.table(paste(baseDataDirectory, "/adjusted_expression_data.txt", sep = ""))
 DEnames.qvals = read.table(paste(baseDataDirectory, "/edgeR/ComBat_SVA/DEnames_qvals.txt", sep = ""))
 qValuesComBat = DEnames.qvals[,1]
 names(qValuesComBat) = row.names(DEnames.qvals)

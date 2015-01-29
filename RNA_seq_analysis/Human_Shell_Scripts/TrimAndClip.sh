@@ -3,8 +3,8 @@
 # Part 1 in RNA-seq analysis
 # Trim ends with low quality and clip adapter sequences
 
-RAW_DATA_DIR="/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanMiSeq"
-PROCESSED_DATA_DIR="/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanMiSeq/ClippedTrimmed"
+RAW_DATA_DIR="/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq"
+PROCESSED_DATA_DIR="/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/ClippedTrimmed"
 
 declare -a sampleNum=(1 2 3 4 5 6 7 8 9 10 11 12)
 declare -a embryoNum=(1 2 3 4 5 6 7 9 10 12 13 14)
