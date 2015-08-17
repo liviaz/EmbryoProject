@@ -372,36 +372,44 @@ grid on;
 %% Figure 4G: AUC_ROC and AUC_PR over time
 
 clear all;
-close all;
+% close all;
 load('forwardFeatureSelection.mat');
 
 numCells = [1 2 3 4];
-AUC_ROC_mouse = [max(ROClist_mouse_mech) max(ROClist_mouse_5feat) ...
-    max(ROClist_mouse_6feat) max(ROClist_mouse_all)];
-AUC_PR_mouse = [max(PRlist_mouse_mech) max(PRlist_mouse_5feat) ...
-    max(PRlist_mouse_6feat) max(PRlist_mouse_all)];
+% AUC_ROC_mouse = [max(ROClist_mouse_mech) max(ROClist_mouse_5feat) ...
+%     max(ROClist_mouse_6feat) max(ROClist_mouse_all)];
+% AUC_PR_mouse = [max(PRlist_mouse_mech) max(PRlist_mouse_5feat) ...
+%     max(PRlist_mouse_6feat) max(PRlist_mouse_all)];
 
-AUC_ROC_human = [max(ROClist_human_mech) max(ROClist_human_5feat) ...
+AUC_ROC_human_all = [max(ROClist_human_mech) max(ROClist_human_5feat) ...
     max(ROClist_human_6feat) max(ROClist_human_all)];
-AUC_PR_human = [max(PRlist_human_mech) max(PRlist_human_5feat) ...
-    max(PRlist_human_6feat) max(PRlist_human_all)];
+% AUC_PR_human = [max(PRlist_human_mech) max(PRlist_human_5feat) ...
+%     max(PRlist_human_6feat) max(PRlist_human_all)];
 
+AUC_ROC_human_mech = max(ROClist_human_mech)*ones(1,4);
+AUC_ROC_human_cc = [0 0.72 0.92 0.95];
 
 
 figure(1); 
+clf;
 set(gca, 'fontsize', 14);
 % h1 = plot(numCells, AUC_ROC_mouse, 'linewidth', 2);
 hold on;
 % h2 = plot(numCells, AUC_PR_mouse, 'linewidth', 2, 'color', [1 0 0]);
-h3 = plot(numCells, AUC_ROC_human, 'linewidth', 2, 'linestyle', '--');
-h4 = plot(numCells, AUC_PR_human, 'linewidth', 2, 'linestyle', '--', 'color', [1 0 0]);
+h3 = plot(numCells, AUC_ROC_human_all, 'linewidth', 2, 'linestyle', '--', 'color', [1 0 0]);
+h4 = plot(numCells, AUC_ROC_human_mech, 'linewidth', 2, 'linestyle', '--');
+h5 = plot(numCells, AUC_ROC_human_cc, 'linewidth', 2, 'linestyle', '--', 'color', [0 .6 0]);
+% h4 = plot(numCells, AUC_PR_human, 'linewidth', 2, 'linestyle', '--', 'color', [1 0 0]);
 % legend([h1 h2 h3 h4], 'Mouse, AUC_R_O_C', 'Mouse, AUC_P_R', ...
 %     'Human, AUC_R_O_C', 'Human, AUC_P_R', 'Location', 'SouthEast');
-legend([h3 h4], 'Human, AUC_R_O_C', 'Human, AUC_P_R', 'Location', 'SouthEast');
+legend([h4 h5 h3], 'mechanics only', 'cell cycle only', ...
+    'mechanics + cell cycle', 'Location', 'SouthEast');
 xlabel('number of cells in embryo');
-ylabel('area under curve');
+ylabel('area under ROC curve');
 title('Predictive Power Increases Over Time');
-ylim([.6 1]);
+ylim([0 1]);
+set(gca, 'ytick', [0 .2 .5 .7 .8 .9 1.0]);
+set(gca, 'yticklabel', {'0', '', '', '0.7', '0.8', '0.9', '1'});
 set(gca, 'xtick', [1 2 3 4]);
 grid on;
 box on;
@@ -471,7 +479,51 @@ set(hc, 'FaceAlpha', .3);
 grid on;
 box on;
 
+%% Control viability
 
+controlV = zeros(1,35);
+controlV(1:23) = 100;
+controlSE = 196*sqrt((23/35)*(12/35)/35); % 95% CI
+
+testV = zeros(1,282);
+testV(1:197) = 100;
+testSE = 196*sqrt((197/282)*(85/282)/282); % 95% CI
+
+
+[h p] = ttest2(controlV, testV)
+
+figure;
+h1 = bar(1, mean(controlV), 'facecolor', [.5 .5 .5]);
+hold on;
+e1 = errorbar(1,mean(controlV),2*controlSE, ...
+    'color', 'k', 'linewidth', 2);
+
+% make width same size as p3e
+h1 = get(e1, 'children');
+x1 = get(h1, 'xdata');
+x1(2) = {[1 1 NaN 0.97 1.03 NaN 0.97 1.03 NaN]};
+set(h1(2), 'xdata', x1{2});
+set(e1, 'children', h1);
+
+h2 = bar(2, mean(testV), 'facecolor', [.5 .5 .5]);
+e2 = errorbar(2,mean(testV),2*testSE, ...
+    'color', 'k', 'linewidth', 2);
+
+% make width same size as p3e
+h2 = get(e2, 'children');
+x2 = get(h2, 'xdata');
+x2(2) = {[2 2 NaN 1.97 2.03 NaN 1.97 2.03 NaN]};
+set(h2(2), 'xdata', x2{2});
+set(e2, 'children', h2);
+
+set(gca, 'xtick', [1 2])
+set(gca, 'fontsize', 14);
+set(gca, 'xticklabel', {'Control', 'Measured'});
+ylabel('% blastocyst formation');
+title('Mechanical measurement does not affect viability');
+xlim([0.5 2.5]);
+ylim([0 100]);
+grid on;
 
 
 

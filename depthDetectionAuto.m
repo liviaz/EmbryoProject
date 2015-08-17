@@ -6,8 +6,8 @@
 %%%%%%%%%% FILL IN TYPE AND DATE HERE %%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-type = 'mouse embryo'; % other values = "human", "mouse embryo" or "mouse oocyte"
-currDate = '1-27-15';
+type = 'custom'; % other values = "human", "mouse embryo" or "mouse oocyte"
+currDate = '7-31-15';
 dateU = currDate;
 dateUI = strfind(currDate, '-');
 dateU(dateUI) = '_';
@@ -17,10 +17,11 @@ dateU(dateUI) = '_';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % measure pipette size first!
-embryoNum = 1;
-pipSize = 125; 
+embryoNum = '16_417';
+vitStatus = 'post';
+pipSize = 128; 
 manualCorner = 0;
-manualMeasure = 1;
+manualMeasure = 0;
 frameStartMult = .45;
 cannyThresh = .35;
 
@@ -61,7 +62,26 @@ elseif isequal(type, 'mouse embryo')
     Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
     adaptHist = 1;
+elseif isequal(type, 'custom')
+    % modify this as needed for experiments that don't fit standard
+    % template
+    filePath2 = ['Raw Data\Videos\Mouse Embryos\videos ', currDate, '\', ...
+        vitStatus, 'Vit\'];
+    filePath3 = ['Processed Data\Mouse embryo analysis\', currDate, ...
+        ' analysis\', vitStatus, 'Vit\'];
+    filePath4 = ['aspiration_data_', dateU, '_E'];
+    frameMult = .8;
+    cropVal = .5;
+    tauStart = .03;
+    pipSizeRef = 126;
+    Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    % 126 pixels is standard opening
+    adaptHist = 1;
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% SHOULD NOT HAVE TO MODIFY CODE PAST THIS POINT %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if strcmp(currDate,'11-19') || strcmp(currDate,'11-30')
     convFactor = 54;
@@ -152,7 +172,7 @@ if manualMeasure
 else
     aspiration_depth = ...
         GetAspirationDepthAuto(framesToGet, ...
-        ROIframes(:,:,round(frameStartMult*frameRate):end), adaptHist)
+        ROIframes(:,:,round(frameStartMult*frameRate):end), adaptHist);
 end
 
 

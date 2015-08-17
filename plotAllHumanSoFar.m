@@ -520,6 +520,90 @@ h3 = legend([h1 h2], 'Survived to Blastocyst (n = 14)', 'Did Not Survive (n = 7)
 set(h3, 'Color', 'none');
 xlim([0 max(xfine)]);
 
+%% Make box plot of parameters
+
+V = log(n0N(mN == 4));
+N = log(n0N(mN == 1));
+
+yV = sort(V);
+yN = sort(N);
+medV = median(yV);
+medN = median(yN);
+
+qUV = median(yV(yV > medV));
+qLV = median(yV(yV < medV));
+qUN = median(yN(yN > medN));
+qLN = median(yN(yN < medN));
+
+topV = max(yV(yV < medV + 3*(qUV - qLV)));
+botV = min(yV(yV > medV - 3*(qUV - qLV)));
+topN = max(yN(yN < medN + 3*(qUN - qLN)));
+botN = min(yN(yN > medN - 3*(qUN - qLN)));
+
+figure(1);
+clf;
+set(gca, 'fontsize', 14);
+p1 = patch([.6 .6 1.4 1.4 .6], [qLN qUN qUN qLN qLN] - medV, [0 0 .6], ...
+    'facealpha', .3, 'edgecolor', [0 0 .6]);
+set(p1, 'linewidth', 1);
+line([.6 1.4], [medN medN] - medV, 'linewidth', 2, 'color', [0 0 .6]);
+line([1 1], [qUN topN] - medV, 'linewidth', 2, 'color', [0 0 .6]);
+line([1 1], [qLN botN] - medV, 'linewidth', 2, 'color', [0 0 .6]);
+line([.6 1.4], [topN topN] - medV, 'linewidth', 2, 'color', [0 0 .6]);
+line([.6 1.4], [botN botN] - medV, 'linewidth', 2, 'color', [0 0 .6]);
+
+hold on;
+p2 = patch([1.6 1.6 2.4 2.4 1.6], [qLV qUV qUV qLV qLV] - medV, [0 .6 0], ...
+    'facealpha', .3, 'edgecolor', [0 .6 0]);
+set(p2, 'linewidth', 1);
+line([1.6 2.4], [medV medV] - medV, 'linewidth', 2, 'color', [0 .6 0]);
+line([2 2], [qUV topV] - medV, 'linewidth', 2, 'color', [0 .6 0]);
+line([2 2], [qLV botV] - medV, 'linewidth', 2, 'color', [0 .6 0]);
+line([1.6 2.4], [topV topV] - medV, 'linewidth', 2, 'color', [0 .6 0]);
+line([1.6 2.4], [botV botV] - medV, 'linewidth', 2, 'color', [0 .6 0]);
+
+scatter(1 + .4*(rand(1,length(N)) - .5), N - medV, 50, [0 0 .6], 'filled');
+scatter(2 + .4*(rand(1,length(V)) - .5), V - medV, 50, [0 .6 0], 'filled');
+
+line([0 3], [0 0], 'linewidth', 2, 'linestyle', '--', 'color', [.5 .5 .5]);
+xlim([.3 2.7]);
+set(gca, 'xtick', []);
+legend([p1 p2], 'nonviable', 'viable', 'location', 'northwest');
+legend('boxoff');
+ylabel('\eta_0 parameter');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

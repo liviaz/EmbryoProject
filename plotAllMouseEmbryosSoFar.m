@@ -38,7 +38,7 @@ filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
 % whichToPlot(28) is 9-24-14 (fresh, measured after microinj, IVF, CBA strain)
 % whichToPlot(29) is 11-26-14 (fresh, measured after IVF, CBA strain)
 
-whichToPlot = [zeros(1,13) 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1];
+whichToPlot = [zeros(1,8) ones(1,5) ones(1,10) 0 0 0 0 0 0];
 plotAuto = [zeros(1,8) ones(1, length(whichToPlot)-8)];
 pixelConv = [54*ones(1,10) 108*ones(1,length(whichToPlot)-10)];
 plotCurves = 0;
@@ -168,6 +168,8 @@ n1list = [];
 gsum = [];
 rsum = [];
 timeLapseOut = [];
+aspirationDataV = []; % keeps all aspiration curves (data, not fit)
+aspirationDataN = []; % keeps all aspiration curves (data, not fit)
 
 for jNum = 1:length(whichToPlot)
     if whichToPlot(jNum)
@@ -249,17 +251,21 @@ for jNum = 1:length(whichToPlot)
                     currPoint = struct('k1', k1, 'n1', n1, 'tau', tau);
                     legendList{1} = currPoint;
                     rsum = yfit;
+                    aspirationDataN = ydata(1:37); % min length
                 elseif morphology{jNum}(iNum) == 4 && isempty(legendList{2})
                     currPoint = struct('k1', k1, 'n1', n1, 'tau', tau);
                     legendList{2} = currPoint;
                     gsum = yfit;
+                    aspirationDataV = ydata(1:37); % min length
                 elseif morphology{jNum}(iNum) == 3 && isempty(legendList{3})
                     currPoint = struct('k1', k1, 'n1', n1, 'tau', tau);
                     legendList{3} = currPoint;
                 elseif morphology{jNum}(iNum) == 2
                     rsum = [rsum; yfit];
+                    aspirationDataN = [aspirationDataN; ydata(1:37)];
                 elseif morphology{jNum}(iNum) == 4
                     gsum = [gsum; yfit];
+                    aspirationDataV = [aspirationDataV; ydata(1:37)];
                 end
                 
             else
@@ -274,9 +280,7 @@ for jNum = 1:length(whichToPlot)
             
             
         end
-        
-        currDateSoFar
-        
+                
     end
 end
 
@@ -291,7 +295,7 @@ if plotCurves
     title('Aspiration Depth of Mouse Embryos');
 end
 
-% Scatter plot
+%% Scatter plot
 
 % normalize variables first
 
