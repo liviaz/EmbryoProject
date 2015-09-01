@@ -17,13 +17,14 @@ dateU(dateUI) = '_';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % measure pipette size first!
-embryoNum = '8_20';
+embryoNum = '7';
 % vitStatus = 'post';
 pipSize = 128; 
 manualCorner = 0;
 manualMeasure = 0;
 frameStartMult = .45;
 cannyThresh = .35;
+
 filePath = 'C:\Users\Livia\Desktop\IVF\';
 
 if isequal(type, 'human')

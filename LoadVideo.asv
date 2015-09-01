@@ -1,0 +1,106 @@
+% load embryo video for measurement
+% LZ 8-31-15
+
+function [newframes, tlist, params] = LoadVideo(type, currDate, pipSize, ...
+    filePathRaw, embryoNum, handles)
+
+dateU = currDate;
+dateUI = strfind(currDate, '-');
+dateU(dateUI) = '_';
+frameStartMult = .45;
+cannyThresh = .35;
+
+if isequal(type, 'Human')
+    procFileName = ['aspiration_data_', dateU, '_human_E'];
+    frameMult = 1.2;
+    cropVal = 1;
+    tauStart = .06;
+    pipSizeRef = 229;
+    Fin = .347 * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
+    % 229 pixels is standard pipette opening
+    adaptHist = 0;
+elseif isequal(type, 'Mouse Oocyte')
+    procFileName = ['aspiration_data_', dateU, '_E'];
+    frameMult = .8;
+    cropVal = .5;
+    tauStart = .03;
+    pipSizeRef = 126;
+    Fin = .167 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    adaptHist = 1;
+elseif isequal(type, 'Mouse Embryo')
+    procFileName = ['aspiration_data_', dateU, '_E'];
+    frameMult = .8;
+    cropVal = .5;
+    tauStart = .03;
+    pipSizeRef = 126;
+    Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    % 126 pixels is standard opening
+    adaptHist = 1;
+end
+
+if strcmp(currDate,'11-19') || strcmp(currDate,'11-30')
+    convFactor = 54;
+    pipLarge = 0;
+else
+    convFactor = 108;
+    pipLarge = 1;
+end
+
+% set path of video and time stamp files
+movpath = [filePathRaw '\E' num2str(embryoNum) '.avi'];
+timepath = [filePathRaw '\E' num2str(embryoNum) '.txt'];
+
+if ~exist(movpath)
+    errordlg('Error! Video file not found');
+    return;
+end
+
+if ~exist(timepath)
+    errordlg('Error! Text file (video timing) not found');
+    return;   
+end
+
+% read in video and time stamp
+obj = VideoReader(movpath);
+fid = fopen(timepath);
+tcell = textscan(fid, '%f');
+fclose(fid);
+tlist = tcell{1,1};
+tlist = tlist(3:end)';
+frameRate = obj.FrameRate;
+
+% read in frames starting just before aspiration
+currFirstFrame = 1;
+currLastFrame = round(frameRate*(frameStartMult+2));
+
+% read in some of the frames, define time vector
+frames = read(obj, [currFirstFrame currLastFrame]);
+tlist = tlist(currFirstFrame:currLastFrame);
+t = 0:1/frameRate:(currLastFrame-currFirstFrame)/frameRate;
+
+% convert frames to grayscale and double format
+s = size(frames);
+numFrames = s(4);
+newframes = zeros(size(frames,1), size(frames,2), numFrames);
+for i = 1:numFrames
+    if s(3) > 1
+        % take each frame and make it grayscale
+        newframes(:,:,i) = double(rgb2gray(frames(:,:,:,i)))/255;
+    else
+        newframes(:,:,i) = double(frames(:,:,i))/255;
+    end
+end
+
+handles.MeasAxes
+
+% make params structure with random params to pass for later use
+params.procFileName = procFileName;
+params.frameMult = frameMult;
+params.cropVal = cropVal;
+params.tauStart = tauStart;
+params.pipSizeRef = pipSizeRef;
+params.Fin = Fin;
+params.adaptHist = adaptHist;
+params.convFactor = convFactor;
+params.pipLarge = pipLarge;
+

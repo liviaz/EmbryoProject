@@ -272,42 +272,32 @@ legend('boxon');
 %% Bar plot of different maturation stages (used to generate Figure 4F in paper)
 
 figure;
-p3 = bar(3, mean(k1N(mN == 2 | mN == 4)), .8, 'facecolor', [.1 .6 .6]);
+p3 = bar(20, mean(k1N(mN == 2 | mN == 4)), 4, 'facecolor', [.1 .6 .6]);
 hold on;
-p3e = errorbar(3, mean(k1N(mN == 2 | mN == 4)), ...
+p3e = errorbar(20, mean(k1N(mN == 2 | mN == 4)), ...
     std(k1N(mN == 2 | mN == 4)), 'color', 'k', 'linewidth', 2);
-h3 = get(p3e, 'children');
-x3 = get(h3, 'xdata');
+setErrorBar(p3e, 20, .3);
 
-p2 = bar(2, mean(k1N(mN == 3)), .8, 'facecolor', [.1 .6 .6]);
+p2 = bar(5, mean(k1N(mN == 3)), 4, 'facecolor', [.1 .6 .6]);
 hold on;
-p2e = errorbar(2, mean(k1N(mN == 3)), ...
+p2e = errorbar(5, mean(k1N(mN == 3)), ...
     std(k1N(mN == 3)), 'color', 'k', 'linewidth', 2);
+setErrorBar(p2e, 5, .3);
 
-% make width same size as p3e
-h2 = get(p2e, 'children');
-x2 = get(h2, 'xdata');
-x2(2) = {[2 2 NaN 1.97 2.03 NaN 1.97 2.03 NaN]};
-set(h2(2), 'xdata', x2{2});
-set(p2e, 'children', h2);
-
-p1 = bar(1, mean(k1N(mN == 1)), .8, 'facecolor', [.1 .6 .6]);
+p1 = bar(0, mean(k1N(mN == 1)), 4, 'facecolor', [.1 .6 .6]);
 hold on;
-p1e = errorbar(1, mean(k1N(mN == 1)), ...
+p1e = errorbar(0, mean(k1N(mN == 1)), ...
     std(k1N(mN == 1)), 'color', 'k', 'linewidth', 2);
+setErrorBar(p1e, 0, .3);
 
-% make width same size as p3e
-h1 = get(p1e, 'children');
-x1 = get(h1, 'xdata');
-x1(2) = {[1 1 NaN 0.97 1.03 NaN 0.97 1.03 NaN]};
-set(h1(2), 'xdata', x1{2});
-set(p1e, 'children', h1);
+plot([0 5 20], [mean(k1N(mN == 1)) mean(k1N(mN == 3)) ...
+    mean(k1N(mN == 2 | mN == 4))], 'linewidth', 2, 'color', [0 0 0]);
 
 set(gca, 'fontsize', 14);
-set(gca, 'xtick', [1 2 3])
-xlim([.5 3.5]);
+set(gca, 'xtick', [0 5 10 15 20])
+xlim([-3 23]);
 ylim([0 .15]);
-set(gca, 'xticklabel', {'GV', 'MI', 'MII'});
+set(gca, 'xticklabel', {'0', '5', '10', '15', '20'});
 ylabel('k_1 parameter (stiffness)');
 title(sprintf('Oocyte mechanics reflect maturation'));
 grid on;

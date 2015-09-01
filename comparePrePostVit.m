@@ -486,7 +486,7 @@ ylim([-.01 .08]);
 legend([h1c h1m], {'Fresh (control)', 'Frozen/thawed'}, ...
     'location', 'northwest');
 set(gca, 'xticklabel', {'30 min', '3 hr'});
-ylabel('change in k1 parameter (stiffness)');
+ylabel('change in k_1 parameter from t_0');
 xlabel('time post-thaw');
 title('Change in stiffness after vitrification');
 xlim([1.5 3.5]);
