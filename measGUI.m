@@ -22,7 +22,7 @@ function varargout = measGUI(varargin)
 
 % Edit the above text to modify the response to help measGUI
 
-% Last Modified by GUIDE v2.5 31-Aug-2015 17:08:15
+% Last Modified by GUIDE v2.5 04-Sep-2015 16:28:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -68,17 +68,28 @@ currDay = num2str(str2num(today(dashes(2)+1:end)));
 setappdata(handles.GUI, 'currDate', [currMonth '-' currDay '-' currYear]);
 setappdata(handles.GUI, 'dateU', [currMonth '_' currDay '_' currYear]);
 setappdata(handles.GUI, 'type', 'Mouse Embryo');
+setappdata(handles.GUI, 'pipRefExists', 0);
 setappdata(handles.GUI, 'embryoNum', '1');
 setappdata(handles.GUI, 'pipSize', 128);
-setappdata(handles.GUI, 'manualCorner', 0);
 setappdata(handles.GUI, 'manualMeasure', 0);
 setappdata(handles.GUI, 'filePathRaw', '');
 setappdata(handles.GUI, 'filePathProc', '');
 setappdata(handles.GUI, 'videoLoaded', 0);
 setappdata(handles.GUI, 'frames', []);
+setappdata(handles.GUI, 'lastFrame', 0);
+setappdata(handles.GUI, 'currFrame', 0);
 setappdata(handles.GUI, 't', []);
 setappdata(handles.GUI, 'params', []);
-setappdata(handles.GUI, 'displayFig', NaN);
+setappdata(handles.GUI, 'paramsFit', []);
+setappdata(handles.GUI, 'displayFig', figure(1));
+setappdata(handles.GUI, 'plotFig', figure(2));
+setappdata(handles.GUI, 'extraFig', figure(3));
+setappdata(handles.GUI, 'zpEnter', 0);
+setappdata(handles.GUI, 'cellEnter', 0);
+
+close(1);
+close(2);
+close(3);
 
 % UIWAIT makes measGUI wait for user response (see UIRESUME)
 % uiwait(handles.GUI);
@@ -123,6 +134,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+
 function DateTextEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to DateTextEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -151,7 +163,6 @@ function DateTextEdit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function PipSizeEdit_Callback(hObject, eventdata, handles)
@@ -212,6 +223,7 @@ setappdata(handles.GUI, 'pipSize', pipSize);
 set(handles.PipSizeEdit, 'String', num2str(pipSize));
 
 
+
 function EmbryoNameEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to EmbryoNameEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -253,27 +265,45 @@ setappdata(handles.GUI, 'manualMeasure', manualMeasure);
 
 
 
-% --- Executes on button press in ManualCorner.
-function ManualCorner_Callback(hObject, eventdata, handles)
-% hObject    handle to ManualCorner (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of ManualCorner
-if get(hObject,'Value')
-    manualCorner = 1;
-else
-    manualCorner = 0;
-end
-
-setappdata(handles.GUI, 'manualCorner', manualCorner);
-
-
 % --- Executes on button press in EmbryoMeasBtn.
 function EmbryoMeasBtn_Callback(hObject, eventdata, handles)
 % hObject    handle to EmbryoMeasBtn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+frames = getappdata(handles.GUI, 'frames');
+t = getappdata(handles.GUI, 't');
+params = getappdata(handles.GUI, 'params');
+embryoNum = getappdata(handles.GUI, 'embryoNum');
+manualMeasure = getappdata(handles.GUI, 'manualMeasure');
+cannyThresh = params.cannyThresh;
+filePathRaw = getappdata(handles.GUI, 'filePathRaw');
+filePathProc = getappdata(handles.GUI, 'filePathProc');
+procFileName = params.procFileName;
+extraFig = getappdata(handles.GUI, 'extraFig');
+startFrame = getappdata(handles.GUI, 'currFrame');
+
+% 1. Get ROI around just pipette opening
+[ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw);
+
+sROI = size(ROIframes);
+params.sROI = sROI;
+setappdata(handles.GUI, 'params', params);
+setappdata(handles.GUI, 'frames', ROIframes);
+setappdata(handles.GUI, 'extraFig', extraFig);
+clear frames;
+
+% 2. Measure params from aspiration depth
+paramsFit = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
+    manualMeasure, filePathProc, procFileName, handles, extraFig, startFrame);
+
+setappdata(handles.GUI, 'paramsFit', paramsFit);
+
+% 3. Display in GUI
+set(handles.k1_box, 'String', sprintf('%0.3f',paramsFit.k1));
+set(handles.n1_box, 'String', sprintf('%0.3f',paramsFit.n1));
+set(handles.tau_box, 'String', sprintf('%0.3f',paramsFit.tau));
+set(handles.k0_box, 'String', sprintf('%0.3f',paramsFit.k0));
 
 
 % --- Executes on button press in LoadVideoBtn.
@@ -287,23 +317,47 @@ dateU = getappdata(handles.GUI, 'dateU')
 type = getappdata(handles.GUI, 'type')
 embryoNum = getappdata(handles.GUI, 'embryoNum')
 pipSize = getappdata(handles.GUI, 'pipSize')
-manualCorner = getappdata(handles.GUI, 'manualCorner')
 manualMeasure = getappdata(handles.GUI, 'manualMeasure')
 filePathRaw = getappdata(handles.GUI, 'filePathRaw')
 filePathProc = getappdata(handles.GUI, 'filePathProc')
 
+if isequal(filePathRaw, '') || isequal(filePathProc, '')
+    errordlg('Please select raw and processed data locations!');
+    return;
+end
 
 [frames, t, params] = LoadVideo(type, currDate, pipSize, filePathRaw, ...
     embryoNum, handles);
+
+currFrame = round(params.frameStartMult*params.frameRate);
 setappdata(handles.GUI, 'frames', frames);
 setappdata(handles.GUI, 't', t);
 setappdata(handles.GUI, 'params', params);
-
 setappdata(handles.GUI, 'videoLoaded', 1);
+setappdata(handles.GUI, 'lastFrame', size(frames,3));
+setappdata(handles.GUI, 'currFrame', currFrame);
+
+% adjust slider params
+set(handles.FrameSlider, 'Min', 1);
+set(handles.FrameSlider, 'Max', size(frames,3));
+set(handles.FrameSlider, 'Value', currFrame);
+
+% reset some variables
+setappdata(handles.GUI, 'zpEnter', 0);
+setappdata(handles.GUI, 'cellEnter', 0);
+axes(handles.PlotAxes);
+cla;
+set(handles.ZPframeLabel, 'String', 'Frame: ');
+set(handles.CellFrameLabel, 'String', 'Frame: ');
+
 set(handles.MeasPipBtn, 'Enable', 'on');
 set(handles.EmbryoMeasBtn, 'Enable', 'on');
 set(handles.NewDisplayBtn, 'Enable', 'on');
-
+set(handles.NewDisplayBtnPlot, 'Enable', 'off');
+set(handles.currFrameLabel, 'String', ['frame: ' ...
+    num2str(round(params.frameStartMult*params.frameRate))]);
+set(handles.videoFileLabel, 'String', ['file: E' ...
+    num2str(embryoNum) '.avi']);
 
 % --- Executes on button press in RawDataBtn.
 function RawDataBtn_Callback(hObject, eventdata, handles)
@@ -317,6 +371,16 @@ filePathRaw = uigetdir(['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\' type], ...
     'Select Raw Data Folder');
 setappdata(handles.GUI, 'filePathRaw', filePathRaw);
 set(handles.RawDataLabel, 'String', filePathRaw);
+
+% check for existence of pipette reference file
+% do this every time raw data is changed
+if exist([filePathRaw '\pipRef.mat'], 'file')
+    set(handles.PipRefIndicator, 'String', 'YES');
+    setappdata(handles.GUI, 'pipRefExists', 1);
+else
+    set(handles.PipRefIndicator, 'String', 'NO');
+    setappdata(handles.GUI, 'pipRefExists', 0);
+end
 
 
 % --- Executes on button press in ProcDataBtn.
@@ -363,4 +427,349 @@ if ~isempty(frames)
     imshow(frames(:,:,1));
 else
     errordlg('Error: no frames loaded');
+end
+
+
+
+function k1_box_Callback(hObject, eventdata, handles)
+% hObject    handle to k1_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of k1_box as text
+%        str2double(get(hObject,'String')) returns contents of k1_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function k1_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to k1_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function n1_box_Callback(hObject, eventdata, handles)
+% hObject    handle to n1_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of n1_box as text
+%        str2double(get(hObject,'String')) returns contents of n1_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function n1_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to n1_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function tau_box_Callback(hObject, eventdata, handles)
+% hObject    handle to tau_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of tau_box as text
+%        str2double(get(hObject,'String')) returns contents of tau_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function tau_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to tau_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function k0_box_Callback(hObject, eventdata, handles)
+% hObject    handle to k0_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of k0_box as text
+%        str2double(get(hObject,'String')) returns contents of k0_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function k0_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to k0_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in NewDisplayBtnPlot.
+function NewDisplayBtnPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to NewDisplayBtnPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+paramsFit = getappdata(handles.GUI, 'paramsFit');
+plotFig = getappdata(handles.GUI, 'plotFig');
+
+if ~isempty(paramsFit)
+    
+    if isnan(displayFig)
+        fig = figure(2);
+        setappdata(handles.GUI, 'plotFig', fig);
+    else
+        figure(plotFig);
+    end
+    
+    clf;
+    KelvinFit3(t, A, Fin, 1, [paramsFit.k0 paramsFit.k1 ...
+        paramsFit.tau paramsFit.n1]);
+else
+    errordlg('Error: no params calculated');
+end
+
+
+% --- Executes on button press in RightBtn.
+function RightBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to RightBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+frames = getappdata(handles.GUI, 'frames');
+currFrame = getappdata(handles.GUI, 'currFrame');
+lastFrame = getappdata(handles.GUI, 'lastFrame');
+
+if ~isempty(frames) && lastFrame > 0 && currFrame > 0
+    if currFrame < lastFrame
+        axes(handles.MeasAxes);
+        imshow(frames(:,:,currFrame + 1));
+        setappdata(handles.GUI, 'currFrame', currFrame + 1);
+        set(handles.currFrameLabel, 'String', ['frame: ' ...
+            num2str(currFrame + 1)]);
+    else
+        errordlg('Already displaying last frame');
+    end
+else
+    errordlg('Error: no frames loaded');
+end
+
+% --- Executes during object creation, after setting all properties.
+function RightBtn_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to RightBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+rightArrow = imread('rightarrow.jpg');
+set(hObject,'units','pixels');
+buttonsize = get(hObject,'position');
+imagesize = size(rightArrow);
+newsize = ceil(imagesize(1:2)/(1.5*max(imagesize(1:2)./buttonsize([4 3]))));
+newimage = rightArrow(round(linspace(1,imagesize(1),newsize(1))),...
+    round(linspace(1,imagesize(2),newsize(2))),:);
+set(hObject,'cdata',newimage);
+
+% --- Executes on button press in LeftBtn.
+function LeftBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to LeftBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+frames = getappdata(handles.GUI, 'frames');
+currFrame = getappdata(handles.GUI, 'currFrame');
+lastFrame = getappdata(handles.GUI, 'lastFrame');
+
+if ~isempty(frames) && lastFrame > 0 && currFrame > 0
+    if currFrame > 1
+        axes(handles.MeasAxes);
+        imshow(frames(:,:,currFrame - 1));
+        setappdata(handles.GUI, 'currFrame', currFrame - 1);
+        set(handles.currFrameLabel, 'String', ['frame: ' ...
+            num2str(currFrame - 1)]);
+    else
+        errordlg('Already displaying first frame');
+    end
+else
+    errordlg('Error: no frames loaded');
+end
+
+% --- Executes during object creation, after setting all properties.
+function LeftBtn_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LeftBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+leftArrow = imread('leftarrow.jpg');
+set(hObject,'units','pixels');
+buttonsize = get(hObject,'position');
+imagesize = size(leftArrow);
+newsize = ceil(imagesize(1:2)/(1.5*max(imagesize(1:2)./buttonsize([4 3]))));
+newimage = leftArrow(round(linspace(1,imagesize(1),newsize(1))),...
+    round(linspace(1,imagesize(2),newsize(2))),:);
+set(hObject,'cdata',newimage);
+
+
+% % --- Executes on button press in PipRefBtn.
+% function PipRefBtn_Callback(hObject, eventdata, handles)
+% % hObject    handle to PipRefBtn (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% filePathRaw = getappdata(handles.GUI, 'filePathRaw');
+% extraFig = getappdata(handles.GUI, 'extraFig');
+% MakeRoiTemplate(filePathRaw, .35, extraFig);
+
+
+% --- Executes on button press in ZonaEnterBtn.
+function ZonaEnterBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to ZonaEnterBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currFrame = getappdata(handles.GUI, 'currFrame');
+setappdata(handles.GUI, 'zpEnter', currFrame);
+set(handles.ZPframeLabel, 'String', ['Frame: ' num2str(currFrame)]);
+
+% --- Executes on button press in CellEnterBtn.
+function CellEnterBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to CellEnterBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currFrame = getappdata(handles.GUI, 'currFrame');
+setappdata(handles.GUI, 'cellEnter', currFrame);
+set(handles.CellFrameLabel, 'String', ['Frame: ' num2str(currFrame)]);
+
+% --- Executes on button press in SaveFrameBtn.
+function SaveFrameBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to SaveFrameBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+zpEnter = getappdata(handles.GUI, 'zpEnter');
+cellEnter = getappdata(handles.GUI, 'cellEnter');
+filePathProc = getappdata(handles.GUI, 'filePathProc');
+embryoNum = getappdata(handles.GUI, 'embryoNum');
+
+if zpEnter > 0
+    if ~isequal(filePathProc, '')
+        save([filePathProc '\celldata_E' embryoNum '.mat'], 'zpEnter', ...
+            'cellEnter');
+    else
+        errordlg('Error: no processed data path selected');
+    end
+else
+    errordlg('Error: must select at least ZP frame');
+end
+
+
+% --- Executes on button press in LoadDataBtn.
+function LoadDataBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to LoadDataBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+filePathProc = getappdata(handles.GUI, 'filePathProc');
+embryoNum = getappdata(handles.GUI, 'embryoNum');
+dateU = getappdata(handles.GUI, 'dateU');
+type = getappdata(handles.GUI, 'type');
+
+if isequal(type, 'Human')
+    extraString = '_human';
+else
+    extraString = '';
+end
+
+testPath = [filePathProc '\AutoMeasure\aspiration_data_' dateU ...
+    extraString '_E' embryoNum '.mat'];
+
+if ~exist(testPath, 'file')
+    testPath = [filePathProc '\aspiration_data_' dateU extraString ...
+        '_E' embryoNum '.mat'];
+end
+
+if exist(testPath, 'file')
+   
+    load(testPath);
+    axes(handles.PlotAxes);
+    cla;
+    
+    L = length(aspiration_depth);
+    plot(t, 10^6*[F0/(k0 + k1) A(1:(L-1))],'ob', 'Color', [0 0 1]);
+    hold on;
+    grid on;
+    % this needs to be shifted to account for truncation during fitting
+    plot(xfine, 10^6*yfit, 'Color', [0 0 1]);
+    set(gca, 'FontSize', 14);
+    xlabel('time (seconds)');
+    ylabel('aspiration depth (\mum)');
+    title('Aspiration Depth into Micropipette');
+    
+    % 3. Display in GUI
+    set(handles.k1_box, 'String', sprintf('%0.3f',k1));
+    set(handles.n1_box, 'String', sprintf('%0.3f',n1));
+    set(handles.tau_box, 'String', sprintf('%0.3f',tau));
+    set(handles.k0_box, 'String', sprintf('%0.3f',k0));
+    
+else
+    errordlg('This embryo has not been measured yet!');
+end
+
+
+% --- Executes on slider movement.
+function FrameSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to FrameSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+frames = getappdata(handles.GUI, 'frames');
+value = get(hObject,'Value');
+currFrame = getappdata(handles.GUI, 'currFrame');
+
+if ~isempty(frames) && lastFrame > 0 && currFrame > 0
+    if currFrame > 1
+        axes(handles.MeasAxes);
+        imshow(frames(:,:,currFrame - 1));
+        setappdata(handles.GUI, 'currFrame', currFrame - 1);
+        set(handles.currFrameLabel, 'String', ['frame: ' ...
+            num2str(currFrame - 1)]);
+    else
+        errordlg('Already displaying first frame');
+    end
+else
+    errordlg('Error: no frames loaded');
+end
+
+
+
+% --- Executes during object creation, after setting all properties.
+function FrameSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to FrameSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
 end

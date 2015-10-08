@@ -95,7 +95,7 @@ measMins = {measMins{:}, {'21', '36', '06'}, {'22', '37', '04'}, ...
 measGroup = {measGroup{:}, [2 2 2 2 2 2 2 2 4 4 4 4 4]};
 
 
-filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
+filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\';
 vitStatus = {'preVit', 'postVit'};
 
 k0list = cell(1,numEmbryos);

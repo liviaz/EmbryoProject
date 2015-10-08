@@ -1,14 +1,19 @@
 function auto_depth = GetAspirationDepthAuto(framesToGet, ...
-    ROIframes, adaptHist)
+    ROIframes, adaptHist, extraFig)
 
-%% Get user to indicate first frame where cell appears
+% Get user to indicate first frame where cell appears
 % click on cell edge for first 5 frames
 
 frameNum = 1;
 currCellFrame = 1;
 foundCell = 0;
-fig = figure;
 manual_depth = zeros(1,5);
+
+if nargin < 4
+    fig = figure;
+else
+    fig = extraFig;
+end
 
 while ~foundCell || currCellFrame < 6
     
@@ -98,9 +103,8 @@ firstBox = imadjust(firstBox);
 %% Now match box to next frame, and repeat
 
 auto_depth = zeros(1, framesToGet-5);
-close(fig);
-fig = figure;
-
+figure(fig);
+clf;
 currBox = firstBox;
 % mN = min(min(medfilt2(abs(ROIframes(:,:,frameNum+1)-ROIframes(:,:,1)),[3 3])));
 % mX = max(max(medfilt2(abs(ROIframes(:,:,frameNum+1)-ROIframes(:,:,1)),[3 3])));

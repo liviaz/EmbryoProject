@@ -8,13 +8,17 @@
 %   manual_depth = aspiration depth in pixels
 %
 
-function manual_depth = GetAspirationDepthManual(numFrames, ROIframes)
+function manual_depth = GetAspirationDepthManual(numFrames, ROIframes, extraFig)
 
-close all;
 frameNum = 1;
-fig = figure;
 firstRun = 1;
 manual_depth1 = [0];
+
+if nargin < 3
+    fig = figure;
+else
+    fig = extraFig;
+end
 
 while frameNum < numFrames
     

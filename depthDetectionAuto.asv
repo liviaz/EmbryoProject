@@ -7,7 +7,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 type = 'custom'; % other values = "human", "mouse embryo" or "mouse oocyte"
-currDate = '8-27-15';
+currDate = '10-2-15';
 dateU = currDate;
 dateUI = strfind(currDate, '-');
 dateU(dateUI) = '_';
@@ -17,19 +17,19 @@ dateU(dateUI) = '_';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % measure pipette size first!
-embryoNum = '7';
+embryoNum = '5_pt3';
+currMult = 3/4;
 % vitStatus = 'post';
 pipSize = 128; 
 manualCorner = 0;
 manualMeasure = 0;
 frameStartMult = .45;
 cannyThresh = .35;
-
 filePath = 'C:\Users\Livia\Desktop\IVF\';
 
 if isequal(type, 'human')
     filePath2 = ['Raw Data\Videos\Human\human tests ', currDate, '\'];
-    filePath3 = ['Processed Data\Human analysis\', currDate, ...
+    filePath3 = ['Processed Data\Human\', currDate, ...
         ' analysis human\'];
     filePath4 = ['aspiration_data_', dateU, '_human_E'];
     frameMult = 1.2;
@@ -40,8 +40,8 @@ if isequal(type, 'human')
     % 229 pixels is standard pipette opening
     adaptHist = 0;
 elseif isequal(type, 'mouse oocyte')
-    filePath2 = ['Raw Data\Videos\Mouse Oocytes\videos ', currDate, '\'];
-    filePath3 = ['Processed Data\Mouse oocyte analysis\', currDate, ...
+    filePath2 = ['Raw Data\Videos\Mouse Oocyte\videos ', currDate, '\'];
+    filePath3 = ['Processed Data\Mouse Oocyte\', currDate, ...
         ' analysis\'];
     filePath4 = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
@@ -51,8 +51,8 @@ elseif isequal(type, 'mouse oocyte')
     Fin = .167 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
 elseif isequal(type, 'mouse embryo')
-    filePath2 = ['Raw Data\Videos\Mouse Embryos\videos ', currDate, '\'];
-    filePath3 = ['Processed Data\Mouse embryo analysis\', currDate, ...
+    filePath2 = ['Raw Data\Videos\Mouse Embryo\videos ', currDate, '\'];
+    filePath3 = ['Processed Data\Mouse embryo\', currDate, ...
         ' analysis\'];
     filePath4 = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
@@ -69,15 +69,15 @@ elseif isequal(type, 'custom')
 %         vitStatus, 'Vit\'];
 %     filePath3 = ['Processed Data\Mouse embryo analysis\', currDate, ...
 %         ' analysis\', vitStatus, 'Vit\'];
-    filePath2 = ['Raw Data\Videos\Mouse Oocytes\videos ', currDate, '\'];
-    filePath3 = ['Processed Data\Mouse oocyte analysis\', currDate, ...
+    filePath2 = ['Raw Data\Videos\Mouse Oocyte\videos ', currDate, '\'];
+    filePath3 = ['Processed Data\Mouse oocyte\', currDate, ...
         ' analysis\'];
     filePath4 = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
     cropVal = .5;
     tauStart = .03;
     pipSizeRef = 126;
-    Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = currMult * .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
     adaptHist = 1;
 end
@@ -139,10 +139,10 @@ framesToGet = round(frameRate*frameMult);
 
 % choose ROI starting at pipette opening
 % bottom bound should not be below bottom of pipette
-[coords, ROIframes] = getROI(newframes, manualCorner, cannyThresh);
+% [coords, ROIframes] = getROI(newframes, manualCorner, cannyThresh);
+ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, [filePath filePath2]);
 sROI = size(ROIframes);
 clear newframes;
-       
 
 if manualMeasure
     
@@ -209,6 +209,7 @@ start_params(3) = tauTryList(fValList == min(fValList));
 fval
 [k1 n1 tau k0]
 % ylim([1*10^-5 max(yfit)*1.2]);
+
 
 % save params if good
 if ~exist([filePath filePath3], 'dir')

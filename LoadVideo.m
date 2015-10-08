@@ -14,7 +14,6 @@ if isequal(type, 'Human')
     procFileName = ['aspiration_data_', dateU, '_human_E'];
     frameMult = 1.2;
     cropVal = 1;
-    tauStart = .06;
     pipSizeRef = 229;
     Fin = .347 * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
     % 229 pixels is standard pipette opening
@@ -23,7 +22,6 @@ elseif isequal(type, 'Mouse Oocyte')
     procFileName = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
     cropVal = .5;
-    tauStart = .03;
     pipSizeRef = 126;
     Fin = .167 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
@@ -31,7 +29,6 @@ elseif isequal(type, 'Mouse Embryo')
     procFileName = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
     cropVal = .5;
-    tauStart = .03;
     pipSizeRef = 126;
     Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
@@ -91,13 +88,12 @@ for i = 1:numFrames
     end
 end
 
-imshow(newframes(:,:,1), 'Parent', handles.MeasAxes);
+imshow(newframes(:,:,round(frameStartMult*frameRate)), 'Parent', handles.MeasAxes);
 
 % make params structure with random params to pass for later use
 params.procFileName = procFileName;
 params.frameMult = frameMult;
 params.cropVal = cropVal;
-params.tauStart = tauStart;
 params.pipSizeRef = pipSizeRef;
 params.Fin = Fin;
 params.adaptHist = adaptHist;

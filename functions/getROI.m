@@ -12,15 +12,34 @@
 %
 
 
-function [coords ROIframes] = getROI(newframes, manualCorner, cannyThresh)
+function [coords, ROIframes, displayFig] = getROI(newframes, ...
+    manualCorner, cannyThresh, displayFig)
 
 if nargin < 3
     cannyThresh = .45;
 end
 
+if nargin < 4
+    displayFig = figure;
+else
+    if ~ishandle(displayFig)
+        if isnan(displayFig)
+            displayFig = figure(3);
+        else
+            figure(displayFig);
+        end
+        clf;
+        
+    else
+        figure(displayFig);
+    end
+end
+
+
 if manualCorner
     
-    figure, imshow(newframes(:,:,1));
+    figure(displayFig);
+    imshow(newframes(:,:,1));
     title('draw region with top corner of pipette');
     coord = getrect;
     % coords = [xmin xmax ymin ymax]
@@ -31,7 +50,8 @@ else
     
 %     figure, imshow(newframes(:,:,1))
     BW = edge(newframes(:,:,1), 'canny', cannyThresh);
-    figure, imshow(BW);
+    figure(displayFig);
+    imshow(BW);
     title('draw region with top corner of pipette');
     coord = getrect;
     % coords = [xmin xmax ymin ymax]
@@ -40,10 +60,10 @@ else
     % given rectangle with top corner of pipette, extract coordinates of edge
     % line and return "corner" point
     [xout yout] = returnCorner(BW, coords);
-    close all;
-    fig = figure;
+    figure(displayFig);
+    clf;
     imshow(BW);
-    truesize(fig, 2*size(newframes(:,:,1)));
+    truesize(displayFig, 2*size(newframes(:,:,1)));
     title('choose bottom right bound of ROI');
     [xb yb] = ginput(1);
     ROIframes = newframes(round(yout:yb), round(xout:xb), :);
