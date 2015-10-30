@@ -286,6 +286,11 @@ startFrame = getappdata(handles.GUI, 'currFrame');
 % 1. Get ROI around just pipette opening
 [ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw);
 
+if exist([filePathRaw '\pipRef.mat'], 'file')
+    set(handles.PipRefIndicator, 'String', 'YES');
+    setappdata(handles.GUI, 'pipRefExists', 1);
+end
+
 sROI = size(ROIframes);
 params.sROI = sROI;
 setappdata(handles.GUI, 'params', params);

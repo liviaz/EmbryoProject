@@ -45,7 +45,7 @@ end
 
 t = t(t < params.cropVal);
 aspiration_depth = aspiration_depth(1:length(t));
-A = aspiration_depth * 40 * 10^-6 / params.convFactor; % convert from pixels to meters
+A = (aspiration_depth - 6) * 40 * 10^-6 / params.convFactor; % convert from pixels to meters
 
 tauTryList = .02:.02:.2;
 fValList = [];

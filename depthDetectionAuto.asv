@@ -6,8 +6,8 @@
 %%%%%%%%%% FILL IN TYPE AND DATE HERE %%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-type = 'custom'; % other values = "human", "mouse embryo" or "mouse oocyte"
-currDate = '10-2-15';
+type = 'mouse oocyte'; % other values = "human", "mouse embryo" or "mouse oocyte"
+currDate = '10-8-15';
 dateU = currDate;
 dateUI = strfind(currDate, '-');
 dateU(dateUI) = '_';
@@ -17,12 +17,12 @@ dateU(dateUI) = '_';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % measure pipette size first!
-embryoNum = '5_pt3';
-currMult = 3/4;
+embryoNum = '11_7';
+currMult = 1;
 % vitStatus = 'post';
 pipSize = 128; 
 manualCorner = 0;
-manualMeasure = 0;
+manualMeasure = 1;
 frameStartMult = .45;
 cannyThresh = .35;
 filePath = 'C:\Users\Livia\Desktop\IVF\';
@@ -90,7 +90,7 @@ if strcmp(currDate,'11-19') || strcmp(currDate,'11-30')
     convFactor = 54;
     pipLarge = 0;
 else
-    convFactor = 108;
+    convFactor = 128;
     pipLarge = 1;
 end
 
@@ -109,9 +109,10 @@ frameRate = obj.FrameRate;
 
 % read in frames starting just before aspiration
 % make detection automatic in the future maybe?
-currFirstFrame = 1;
-currLastFrame = round(frameRate*(frameStartMult+2));
 totalFrames = round(frameRate*frameMult);
+currFirstFrame = 1;
+currLastFrame = min(totalFrames, round(frameRate*(frameStartMult+2)));
+
 
 % read in some of the frames, define time vector
 frames = read(obj, [currFirstFrame currLastFrame]);
@@ -122,7 +123,7 @@ tlist = tlist(currFirstFrame:currLastFrame);
 t = 0:1/frameRate:(currLastFrame-currFirstFrame)/frameRate;
 
 % convert frames to grayscale and double format
-s = size(frames);
+s = size(frames)
 numFrames = s(4);
 newframes = zeros(size(frames,1), size(frames,2), numFrames);
 for i = 1:numFrames
@@ -139,9 +140,10 @@ framesToGet = round(frameRate*frameMult);
 
 % choose ROI starting at pipette opening
 % bottom bound should not be below bottom of pipette
-% [coords, ROIframes] = getROI(newframes, manualCorner, cannyThresh);
-ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, [filePath filePath2]);
+[coords, ROIframes] = getROI(newframes, manualCorner, cannyThresh);
+% ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, [filePath filePath2]);
 sROI = size(ROIframes);
+size(newframes)
 clear newframes;
 
 if manualMeasure
@@ -183,7 +185,7 @@ end
 close all;
 t = t(t < cropVal);
 aspiration_depth = aspiration_depth(1:length(t));
-A = aspiration_depth * 40 * 10^-6 / convFactor; % convert from pixels to meters
+A = (aspiration_depth-6) * 40 * 10^-6 / convFactor; % convert from pixels to meters
 
 figure(5);
 clf;

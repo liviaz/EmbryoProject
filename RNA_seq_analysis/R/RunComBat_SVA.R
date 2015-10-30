@@ -50,7 +50,7 @@ combat.edata = combat.edata[rowMeans(combat.edata) > 0,]
 # calculate pvalues and qvalues
 pValuesComBat = f.pvalue(as.matrix(combat.edata), mod, mod0)
 qValuesComBat = p.adjust(pValuesComBat, method = "BH")
-#write.table(as.character(names(qValuesComBat[qValuesComBat < .01])), paste(baseDataDirectory, "/edgeR/qVals_lt_pt01_ComBat.txt", sep = ""), row.names=FALSE, quote=FALSE)
+write.table(as.character(names(qValuesComBat[qValuesComBat < .05])), paste(baseDataDirectory, "/qVals_lt_pt05.txt", sep = ""), row.names=FALSE, quote=FALSE)
 # write.table(as.character(names(qValuesSv[qValuesSv < .1])), paste(baseDataDirectory, "/edgeR/ComBat_SVA/qVals_lt_pt05_SVA.txt", sep = ""), row.names=FALSE, quote=FALSE)
 write.table(combat.edata, paste(baseDataDirectory, "/adjusted_expression_data.txt", sep = ""))
 write.table(qValuesComBat, paste(baseDataDirectory, "/adjusted_expression_qvals.txt", sep = ""))
@@ -167,8 +167,8 @@ upGenesDE = names(logFC.DE[logFC.DE > 0])
 downGenesDE = names(logFC.DE[logFC.DE < 0])
 #write.table(as.character(upGenesDE), paste(baseDataDirectory, "/edgeR/ComBat_SVA/upGenes_qVals_pt01.txt", sep = ""), row.names=FALSE, quote=FALSE)
 #write.table(as.character(downGenesDE), paste(baseDataDirectory, "/edgeR/ComBat_SVA/downGenes_qVals_pt01.txt", sep = ""), row.names=FALSE, quote=FALSE)
-# write.table(names(DEnames.qvals[DEnames.qvals < .02]), paste(baseDataDirectory, "/edgeR/ComBat_SVA/allGenes_qvals_pt02.txt", sep = ""), 
-#              row.names=FALSE, quote=FALSE, col.names = FALSE)
+write.table(names(DEnames.qvals[DEnames.qvals < .01]), paste(baseDataDirectory, "allGenes_qvals_pt01.txt", sep = ""), 
+              row.names=FALSE, quote=FALSE, col.names = FALSE)
 
 # upGenes cell cycle genes
 c6 = c("GO:0030163", "GO:0042176", "GO:0070271",  "GO:0030163", "GO:0008104")

@@ -19,7 +19,7 @@ embryosSamePatient = c(3,4,6,7,8,10,11,12,13,14,15,16,17,18,20,21,22)
 
 
 combat.edata = read.table(paste(baseDataDirectory, "/adjusted_expression_data.txt", sep = ""))
-DEnames.qvals = read.table(paste(baseDataDirectory, "/edgeR/ComBat_SVA/DEnames_qvals.txt", sep = ""))
+DEnames.qvals = read.table(paste(baseDataDirectory, "/DEnames_qvals.txt", sep = ""))
 qValuesComBat = DEnames.qvals[,1]
 names(qValuesComBat) = row.names(DEnames.qvals)
 DEnames.qvals = qValuesComBat

@@ -39,7 +39,7 @@ if strcmp(currDate,'11-19') || strcmp(currDate,'11-30')
     convFactor = 54;
     pipLarge = 0;
 else
-    convFactor = 108;
+    convFactor = 128;
     pipLarge = 1;
 end
 
@@ -68,7 +68,8 @@ frameRate = obj.FrameRate;
 
 % read in frames starting just before aspiration
 currFirstFrame = 1;
-currLastFrame = round(frameRate*(frameStartMult+2));
+currLastFrame = min(obj.NumberOfFrames - 2, round(frameRate*(frameStartMult+2)));
+
 
 % read in some of the frames, define time vector
 frames = read(obj, [currFirstFrame currLastFrame]);

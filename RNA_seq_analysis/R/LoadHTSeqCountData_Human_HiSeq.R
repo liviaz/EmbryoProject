@@ -25,10 +25,10 @@ library(clValid)
 
 if (Sys.info()["sysname"] == "Linux") {
   source("/host/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "/host/Users/Livia/Desktop/liviaz4189@gmail.com/Processed Data"
+  baseDataDirectory <- "/host/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/countData"
 } else {
   source("C:/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "C:/Users/Livia/Desktop/liviaz4189@gmail.com/Processed Data"
+  baseDataDirectory <- "C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/countData"
 }
 
 
