@@ -1,18 +1,20 @@
 % make ROI template
 
 
-function [] = MakeRoiTemplate(filePathRaw, cannyThresh, displayFig)
+function [] = MakeRoiTemplate(filePathRaw, cannyThresh, displayFig, singleFrame)
 
 if nargin < 3 || isnan(displayFig)
     displayFig = figure;
 end
 
-vidFileRef = uigetfile([filePathRaw '\*.avi'], 'Select video file');
-obj = VideoReader([filePathRaw '\' vidFileRef]);
-singleFrame = read(obj, 1);
+if nargin < 4
+    vidFileRef = uigetfile([filePathRaw '\*.avi'], 'Select video file');
+    obj = VideoReader([filePathRaw '\' vidFileRef]);
+    singleFrame = read(obj, 1);
 
-if length(size(singleFrame)) > 2
-    singleFrame = rgb2gray(singleFrame);
+    if length(size(singleFrame)) > 2
+        singleFrame = rgb2gray(singleFrame);
+    end
 end
 
 BW = edge(singleFrame, 'canny', cannyThresh);

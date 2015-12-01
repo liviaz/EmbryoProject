@@ -2,7 +2,11 @@
 % do it based on template matching, not just corner detection anymore
 
 function [ROIframesOut] = GetPipetteROI(frames, ...
-    cannyThresh, extraFig, filePathRaw)
+    cannyThresh, extraFig, filePathRaw, useExistingFrame)
+
+if nargin < 4
+    useExistingFrame = 0;
+end
 
 if isequal(filePathRaw(end), '\') || isequal(filePathRaw(end), '/')
     filePathRaw = filePathRaw(1:end-1);
@@ -10,7 +14,11 @@ end
 
 if ~exist([filePathRaw '\pipRef.mat'], 'file')
     % save template of original 
-    MakeRoiTemplate(filePathRaw, cannyThresh, extraFig);
+    if useExistingFrame
+        MakeRoiTemplate(filePathRaw, cannyThresh, extraFig, frames(:,:,1));
+    else
+        MakeRoiTemplate(filePathRaw, cannyThresh, extraFig);
+    end
 end
 
 

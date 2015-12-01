@@ -64,18 +64,10 @@ x = as.data.frame(combat.edata) #[qValuesComBat < .01,]
 x = x[!is.na(rowSums(x)),]
 pca = prcomp(t(x))
 fac = factor(conditionDiff[embryosSamePatient])
-colours = brewer.pal(nlevels(fac), "Paired") 
-#colours = hmcol
-xyplot(PC2 ~ PC1, groups = fac, data = as.data.frame(pca$x), pch = 16, cex = 2, aspect = "fill", 
-       col = colours, main = draw.key(key = list(rect = list(col = colours), text = list(levels(fac)), rep = FALSE)))#, 
-#    xlim = c(-20,20), ylim = c(-30, 15))
-colours = colours[c(2,4,1,3)]
-
 colours = c("#00009b", "#009b00")
 plot3d(pca$x[,"PC1"], pca$x[,"PC2"], pca$x[,"PC3"], col = colours[as.numeric(as.factor(conditionAll[embryosSamePatient]))], 
        size = 20, box = FALSE, xlab = "", ylab = "", zlab = "")
 decorate3d(xlim = c(-30, 30), xlab = "", ylab = "", zlab = "", box = FALSE)
-
 ggplot(as.data.frame(pca$x), aes(PC1,PC2, color=conditionAll[embryosSamePatient])) + geom_point(size=5) + geom_text(hjust=-.5, vjust=-.5,aes(label=as.character(1:22)[embryosSamePatient]))
 
 ######################################################
@@ -84,8 +76,6 @@ ggplot(as.data.frame(pca$x), aes(PC1,PC2, color=conditionAll[embryosSamePatient]
 
 hmcol = c("#009b00", "#009b00", "#00009b", "#00009b", "#00009b", "#00009b", "#00009b")
 hc = hclust(dist(t(combat.edata)))
-# hc = hclust(dist(t(log2(cpm(yDiff)+1))))
-#plot(as.phylo(hc), tip.color=hmcol[lane-1])
 plot(as.phylo(hc), tip.color=hmcol[ceiling(decDist[embryosSamePatient])])
 
 
@@ -182,7 +172,6 @@ length(DEnames.qvals[genes][DEnames.qvals[genes] < .05])
 length(DEnames.qvals[genes])
 length(DEnames.qvals[genes][DEnames.qvals[genes] < .05])/length(DEnames.qvals[genes])
 DEnames.qvals[genes][DEnames.qvals[genes] < .01]
-
 # write.table(DEnames.qvals[genes][DEnames.qvals[genes] < .01], paste(baseDataDirectory, "/edgeR/Cytoscape/proteinFunctions_DE_q_lt01.txt", sep = ""), row.names = TRUE, col.names = FALSE, quote = FALSE)
 
 # now take average and standard deviation logFC for all those genes
@@ -233,8 +222,10 @@ legend(1,14, c("viable", "nonviable"), fill = c("#009b00", "#00009b"))
 box()
 
 
-########
+########################
 # Filter genes by highest within-group mean/variance
+########################
+
 conditionNum = c(0,2,0,0,0,2,2,2,2,0,1,1,1,1,1,1,3,3,3,3,3,1)
 BCV_b1 = as.data.frame(sqrt(rowVars(cpm(yDiff)[,conditionNum == 0])) / rowMeans(cpm(yDiff)[,conditionNum == 0]))
 BCV_g1 = as.data.frame(sqrt(rowVars(cpm(yDiff)[,conditionNum == 2])) / rowMeans(cpm(yDiff)[,conditionNum == 2]))
@@ -254,7 +245,6 @@ pca = prcomp(t(x))
 fac = factor(conditionDiff)
 colours = brewer.pal(nlevels(fac), "Paired") 
 ggplot(as.data.frame(pca$x), aes(PC1,PC2, color=conditionDiff)) + geom_point(size=5) + geom_text(hjust=-.5, vjust=-.5,aes(label=as.character(1:22)))
-
 
 scatterplot3d(pca$x[,"PC1"], pca$x[,"PC2"], pca$x[,"PC3"], color = colours)
 

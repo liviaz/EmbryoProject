@@ -29,8 +29,6 @@ logFC = rowMeans(combat.edata[,conditionAll[embryosSamePatient] == "good"]) -
 # re-plot phylo
 hmcol = c("#009b00", "#009b00", "#00009b", "#00009b", "#00009b", "#00009b", "#00009b")
 hc = hclust(dist(t(combat.edata)))
-# hc = hclust(dist(t(log2(cpm(yDiff)+1))))
-#plot(as.phylo(hc), tip.color=hmcol[lane-1])
 plot(as.phylo(hc), tip.color=hmcol[ceiling(decDist[embryosSamePatient])])
 
 

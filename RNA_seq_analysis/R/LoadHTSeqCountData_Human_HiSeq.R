@@ -2,7 +2,7 @@
 
 source("http://bioconductor.org/biocLite.R")
 library(Rsamtools)
-library(DESeq2)
+#library(DESeq2)
 library(edgeR)
 library(sva)
 library(ALL)

@@ -114,7 +114,13 @@ currBox = firstBox;
 % writerObj = VideoWriter(fileName);
 % open(writerObj);
 
-for i = 1:framesToGet-5
+if (framesToGet + frameNum) > size(ROIframes,3)
+    maxI = framesToGet - frameNum - 1;
+else 
+    maxI = framesToGet;
+end
+
+for i = 1:maxI
     
     % match currBox to next pipette frame
     if adaptHist
@@ -136,7 +142,7 @@ for i = 1:framesToGet-5
     yBest = yBest/scaleFactor;
     
     figure(fig);
-    imshow(RF, 'InitialMagnification', 300);
+    imshow(RF, 'InitialMagnification', 400);
     hold on;
     line(scaleFactor*[xBest xBest], scaleFactor*[currY-80 currY+80], 'color', [1 1 0], 'linewidth', 2);
     hold off;

@@ -5,9 +5,9 @@
 date = '10-21-15';
 fileDir = ['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\Mouse Oocyte\videos ' date];
 procDir = ['C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\' date ' analysis'];
-type = 'Zona'; 
-eNum = 3;
-embryoNum = 'E133';
+type = 'Membrane'; 
+eNum = 2;
+embryoNum = 'E2';
 convToMicrons = 40/128;
 % colorList = [0 0 .6; 0 .6 0; .6 0 0; 0 .6 .6; .6 0 .6];
 
