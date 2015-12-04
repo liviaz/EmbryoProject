@@ -15,7 +15,7 @@ function [paramsOut, morphologyOut] = getMouseParams(type, whichToPlot)
 % load params based on type
 if strcmp(type, 'mouse embryo')
     
-    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
+    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\';
 
     % don't use auto plot for 11-19 or 11-30
     
@@ -291,7 +291,7 @@ if strcmp(type, 'mouse embryo')
     
 elseif strcmp(type, 'mouse oocyte')
     
-    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse oocyte analysis\';
+    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse oocyte\';
     
     % whichToPlot(1) is 5-14-13 (M2)
     % whichToPlot(2) is 5-30-13 (M2)

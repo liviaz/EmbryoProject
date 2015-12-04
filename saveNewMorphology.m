@@ -13,7 +13,7 @@ if isequal(type, 'human')
     % 3 = average quality blast
     % 4 = good quality blast
     
-    TimeLapseParams = xlsread('C:\Users\Livia\Desktop\IVF\Processed Data\Human analysis\cell cycle parameters.xlsx');
+    TimeLapseParams = xlsread('C:\Users\Livia\Desktop\IVF\Processed Data\Human\cell cycle parameters.xlsx');
 
     % 3-8-13 cleavage stage
     morphology3_20_13 = [1 2 4 4];
@@ -223,7 +223,7 @@ elseif isequal(type, 'mouse oocyte')
 elseif isequal(type, 'mouse embryo')
     
 %     clear all;
-    TimeLapseParams = xlsread('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\cell cycle parameters.xlsx');
+    TimeLapseParams = xlsread('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\cell cycle parameters.xlsx');
 
     morphology621 = [3 4 4 2 4 2 2 4 4 4 2 4 4 2 3];
     timeLapse621 = [];

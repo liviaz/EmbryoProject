@@ -4,7 +4,7 @@
 
 % clear all;
 % close all;
-filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human analysis\';
+filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human\';
 
 % whichToPlot(1) is 3-20-13, whichToPlot(2) is 4-2-13, both cleavage stage
 % 3 is 4-17-13, cleavage stage
@@ -110,8 +110,10 @@ taulist = [];
 elonglist = [];
 n1list = [];
 
-sumCell = cell(1,5);
+map = [0 0 .6; 0 .6 0];
+colorIdx = [];
 
+sumCell = cell(1,5);
 mList = [];
 
 timeLapseOut = [];
@@ -130,7 +132,7 @@ for j = 1:length(whichToPlot)
         s = size(cCurr(morphology{j} == 4, :));
         cCurr(morphology{j} == 4, :) = repmat([0 .6 0], s(1), 1);
         s = size(cCurr(morphology{j} == 1, :));
-        cCurr(morphology{j} == 1, :) = repmat([1 0 0], s(1), 1);
+        cCurr(morphology{j} == 1, :) = repmat([0 0 .6], s(1), 1);
         s = size(cCurr(morphology{j} == 5, :));
         cCurr(morphology{j} == 5, :) = repmat([.7 .7 0], s(1), 1);
         
@@ -145,7 +147,7 @@ for j = 1:length(whichToPlot)
         for i = 1:length(morphology{j})
         
         embryoString = num2str(i);
-        
+                
         % if plotAuto is on, see if an automatically measured file exists.
         % If not, just use the manually measured one.
         % if plotAuto is off, just use the manually measured one
@@ -174,6 +176,12 @@ for j = 1:length(whichToPlot)
             taulist = [taulist tau];
             n1list = [n1list n1];
             elonglist = [elonglist F0/(k0 + k1)];
+            
+            if morphology{j}(i) == 4
+                colorIdx = [colorIdx 2];
+            else
+                colorIdx = [colorIdx 1];
+            end
             
             currColor = cCurr(i,:);
             xdata = t;
@@ -211,6 +219,7 @@ for j = 1:length(whichToPlot)
             taulist = [taulist NaN];
             n1list = [n1list NaN];
             elonglist = [elonglist NaN];
+            colorIdx = [colorIdx NaN];
         end
         end
         
@@ -248,7 +257,8 @@ T3 = tLN(:,3);
 
 
 figure;
-h = scatter3(k1N, n1N, k0N, 200, colorMat(numsToPlot,:), 'filled');
+colormap(map)
+h = scatter3(k1N, n1N, k0N, 200, colorIdx(numsToPlot), 'filled'); %colorMat(numsToPlot,:), 'filled');
 
 set(h, 'Marker', 'o');
 set(gca, 'FontSize', 14);

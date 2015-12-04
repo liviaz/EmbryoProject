@@ -8,6 +8,7 @@ close all;
 
 %% 1. For each embryo, save tiff stack
 
+% run this ONLY if TIFFs don't already exist
 imageDirectory = 'C:\Users\Livia\Desktop\IVF\CG stain\microinjections\';
 dirNames = {'Ab-soft\', 'Ab-mid\', 'Ab-stiff\', 'BAPTA-soft\CG-1\', ...
     'BAPTA-soft\CG-2\',  'BAPTA-mid\', 'BAPTA-stiff\', ...
@@ -56,7 +57,7 @@ end
 
 % build struct
 % sub-structs for group, and embryo within each group
-fileToSave = 'data/embryoInfoMicroinjection.mat';
+fileToSave = 'C:/Users/Livia/Desktop/IVF/Processed Data/Mouse Embryo/microinjection_data/embryoInfoMicroinjection.mat';
 groupNames = {'Ab_soft', 'Ab_mid', 'Ab_stiff', ...
     'BAPTA_soft', 'BAPTA_mid', 'BAPTA_stiff', ...
     'Control_soft', 'Control_mid', 'Control_stiff', ...
@@ -198,7 +199,7 @@ load(fileToSave);
 embryosInGroup = embryoInfo.embryosInGroup;
 groupNames = embryoInfo.groupNames;
 
-for i = [1 2 3 7 8 9] %1:length(embryosInGroup)
+for i = 9%1:length(embryosInGroup)
     
     % select ROI and save
     for j = 1:embryosInGroup(i)

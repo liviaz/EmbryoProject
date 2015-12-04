@@ -5,18 +5,18 @@
 %% Figure 1B
 
 % load in aspiration depth data
-load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\2-20-14 analysis\AutoMeasure\aspiration_data_2_20_14_E35.mat')
+load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\2-20-14 analysis\AutoMeasure\aspiration_data_2_20_14_E35.mat')
 aspiration_depth = aspiration_depth * 40 * 10^-6 / 108;
 xdata = t;
 ydata = aspiration_depth;
 
 
 % load in pressure data
-fid = fopen('C:/Users/Livia/Desktop/IVF/Raw Data/Videos/Mouse Embryos/videos 2-20-14/E35_pressure.txt');
+fid = fopen('C:/Users/Livia/Desktop/IVF/Raw Data/Videos/Mouse Embryo/videos 2-20-14/E35_pressure.txt');
 P = fscanf(fid,'%f');
 P = P(43:end);
 fclose(fid);
-fid = fopen('C:/Users/Livia/Desktop/IVF/Raw Data/Videos/Mouse Embryos/videos 2-20-14/E35.txt');
+fid = fopen('C:/Users/Livia/Desktop/IVF/Raw Data/Videos/Mouse Embryo/videos 2-20-14/E35.txt');
 tP = fscanf(fid, '%f');
 tP = tP(43:end);
 tP = cumsum(tP);
@@ -525,12 +525,37 @@ xlim([0.5 2.5]);
 ylim([0 100]);
 grid on;
 
+%% generate sample histogram for Figure 1
+
+a1 = normrnd(1.5,0.3,1,100);
+a2 = normrnd(0.8,0.2,1,100);
+
+% make smoothed kernel density plot
+[fN xiN] = ksdensity(a1);
+[fV xiV] = ksdensity(a2);
+
+figure;
+hold on;
+v1 = plot(xiV, fV, 'Color', [.8 .6 .3], 'linewidth', 2);
+nv1 = plot(xiN, fN, 'Color', [.3 .6 .8], 'linewidth', 2);
+h = area(xiV, fV, 'EdgeColor', [.8 .6 .3], 'FaceColor', [.8 .6 .3]);
+hc = get(h, 'Children');
+set(hc, 'FaceAlpha', .3);
+h = area(xiN, fN, 'EdgeColor', [.3 .6 .8], 'FaceColor', [.3 .6 .8]);
+hc = get(h, 'Children');
+set(hc, 'FaceAlpha', .3);
+xlim([-.1,2.5]);
+grid on;
+box on;
 
 
+%% Other figures...
 
 
-
-
+% Fig 4C: makeMicroinjectionFigs.m
+% Fig 4D: analyzeMicroinjectionData.m
+% Fig 4E: makeMicroinjectionFigs.m
+% Fig 4F: plotAllMouseOocytesSoFar.m
 
 
 

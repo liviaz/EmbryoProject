@@ -19,7 +19,7 @@ embryosSamePatient = c(3,4,6,7,8,10,11,12,13,14,15,16,17,18,20,21,22)
 
 
 combat.edata = read.table(paste(baseDataDirectory, "/adjusted_expression_data.txt", sep = ""))
-DEnames.qvals = read.table(paste(baseDataDirectory, "/DEnames_qvals.txt", sep = ""))
+DEnames.qvals = read.table(paste(baseDataDirectory, "/adjusted_expression_qvals.txt", sep = ""))
 qValuesComBat = DEnames.qvals[,1]
 names(qValuesComBat) = row.names(DEnames.qvals)
 DEnames.qvals = qValuesComBat
@@ -27,6 +27,7 @@ logFC = rowMeans(combat.edata[,conditionAll[embryosSamePatient] == "good"]) -
   rowMeans(combat.edata[,conditionAll[embryosSamePatient] == "bad"])
 
 # re-plot phylo
+names(combat.edata) = c("E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17")
 hmcol = c("#009b00", "#009b00", "#00009b", "#00009b", "#00009b", "#00009b", "#00009b")
 hc = hclust(dist(t(combat.edata)))
 plot(as.phylo(hc), tip.color=hmcol[ceiling(decDist[embryosSamePatient])])
@@ -126,7 +127,7 @@ ggplot(as.data.frame(dataToPlot)) +
  #      legend.background = element_rect(colour = 'black'), legend.justification = c(0,1)) +
   xlab(NULL) +
   ylab("Log-fold-change") +
-  ylim(-2, 2) +
+  ylim(-1.5, 1.5) +
   ggtitle("Genes Important for Fertilization") +
   scale_colour_manual(values = c("#00009b", "#009b00")) +
   scale_fill_manual(values = c("#00009b", "#009b00"))
@@ -163,17 +164,17 @@ write.table(namesEntrez, file = paste(baseDataDirectory, "/edgeR/Cytoscape/names
 
 embryoMech = as.data.frame(t(read.table("C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/embryoMechanics/humanEmbryoParams.txt")))
 embryoDecDist = as.data.frame(t(read.table("C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/embryoMechanics/humanEmbryoDecDist.txt")))
-names(embryoMech) = c("mN", "k1N", "n1N", "k0N", "tN")
+names(embryoMech) = c("mN", "k1N", "n1N", "k0N" , "tN")
 names(embryoDecDist) = "decDist"
 row.names(embryoMech) = 1:89
 row.names(embryoDecDist) = 1:89
-embryoMech = cbind(embryoMech, embryoDecDist)
+#embryoMech = cbind(embryoMech, embryoDecDist)
 
-embryoMech = embryoMech[,c("mN", "k1N", "n1N", "k0N", "decDist")] # take out tN
-# embryoMech[,c("k1N", "n1N", "k0N")] = log(embryoMech[,c("k1N", "n1N", "k0N")]) # take log scale for n1 and k0
-# 
-# colMeanVars = matrix(rep(apply(embryoMech[embryoMech[,"mN"] == 4,][,c("k1N", "n1N", "k0N", "decDist")], 2, median), each = 89), nrow = 89)
-# embryoMech[,c("k1N", "n1N", "k0N", "decDist")] = embryoMech[,c("k1N", "n1N", "k0N", "decDist")] - colMeanVars # subtract avg good embryo
+embryoMech = embryoMech[,c("mN", "k1N", "n1N", "k0N")]# , "decDist")] # take out tN
+embryoMech[,c("k1N", "n1N", "k0N")] = log(embryoMech[,c("k1N", "n1N", "k0N")]) # take log scale for n1 and k0
+
+colMeanVars = matrix(rep(apply(embryoMech[embryoMech[,"mN"] == 4,][,c("k1N", "n1N", "k0N")], 2, median), each = 89), nrow = 89)
+embryoMech[,c("k1N", "n1N", "k0N")] = embryoMech[,c("k1N", "n1N", "k0N")] - colMeanVars # subtract avg good embryo
 
 embryo.colors = data.frame(viable = "#009b00", nonviable = "#00009b")
 embryoMech = melt(embryoMech, id = "mN")
@@ -194,7 +195,7 @@ ggplot(as.data.frame(embryoMech)) +
   xlab(NULL) +
   ylab("Change from Median Viable Embryo") +
 #   ylim(-0.75, 4) +
-  scale_y_continuous(trans = "log") + 
+#  scale_y_continuous(trans = "log") + 
   ggtitle("Mechanical Parameter Distributions") +
   scale_colour_manual(values = c("#00009b", "#009b00")) +
   scale_fill_manual(values = c("#00009b", "#009b00"))

@@ -5,7 +5,7 @@
 % 1-27-15
 
 % load struct with all 36 embryos, and their associated file paths
-load('embryoInfoCG.mat');
+load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Embryo\cg_imaging\embryoInfoCG.mat');
 nEmbryos = sum(embryoInfo.numEmbryosInImage);
 newImDisplayIndex = [1 cumsum(embryoInfo.numEmbryosInImage) + 1];
 embryoNumSum = [0 cumsum(embryoInfo.numEmbryosInImage)];
@@ -171,7 +171,7 @@ title(sprintf('Average brightness \nnear cell membrane'));
 %% Load struct with all embryo params and plot
 
 % load struct with all 36 embryos, and their associated file paths
-load('embryoInfoCG.mat');
+load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Embryo\cg_imaging\embryoInfoCG.mat');
 nEmbryos = sum(embryoInfo.numEmbryosInImage);
 newImDisplayIndex = [1 cumsum(embryoInfo.numEmbryosInImage) + 1];
     

@@ -14,9 +14,9 @@ groupNum(1:34) = 1;
 groupNum(35:65) = 2;
 groupNum(66:84) = 3;
 embryoNum = 1:104;
-
-[num, txt, ~] = xlsread('data/embryoPN-9-24-14.xlsx');
-pnList = num(:,2)';
+% 
+% [num, txt, ~] = xlsread('data/embryoPN-9-24-14.xlsx');
+% pnList = num(:,2)';
 
 colorMat = zeros(104,3);
 k0list = [];
@@ -25,11 +25,11 @@ n0list = [];
 taulist = [];
 n1list = [];
 
-dataDir = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
+dataDir = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\';
 
 for i = 1:104
     
-    colorMat = fillColorMat(colorMat, groupNum(i), pnList(i), i);
+    colorMat = fillColorMat(colorMat, groupNum(i), 1, i);
     embryoString = num2str(i);
     
     % load data from embryo i
@@ -68,7 +68,7 @@ n1N = n1list(numsToPlot);
 tN = taulist(numsToPlot);
 k0N = k0list(numsToPlot);
 n0N = n0list(numsToPlot);
-pN = pnList(numsToPlot);
+% pN = pnList(numsToPlot);
 
 % 2. Plot data
 figure;

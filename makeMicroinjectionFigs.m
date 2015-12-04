@@ -5,7 +5,7 @@
 
 %% START HERE FOR FIGS Make scatterplot from params
 
-fileToSave = 'data/embryoInfoMicroinjection.mat';
+fileToSave = 'C:/Users/Livia/Desktop/IVF/Processed Data/Mouse Embryo/microinjection_data/embryoInfoMicroinjection.mat';
 load(fileToSave);
 circMeanList = embryoInfo.circMeanList;
 circStdList = embryoInfo.circStdList;
@@ -59,7 +59,7 @@ date1 = '9-24-14';
 date2 = '9_24_14';
 
 embryoDataDirectory = ['C:\Users\Livia\Desktop\IVF\Processed Data\' ...
-    'Mouse embryo analysis\', date1, ' analysis\'];
+    'Mouse embryo\', date1, ' analysis\'];
 dataFileName = ['aspiration_data_', date2, '_E'];
 fullDataDir = [];
 
@@ -196,6 +196,8 @@ xlim([.1 .23]);
 [p h] = ranksum(circMeanList{groupNums == 3}, circMeanList{groupNums == 9})
 % 2. Stiffness btwn stiffest quartile of Ab-injected vs control-injected
 [p h] = ranksum(k1list{groupNums == 3}, k1list{groupNums == 9})
+% 2. Stiffness btwn softest quartile of Ab-injected vs control-injected
+[p h] = ranksum(k1list{groupNums == 1}, k1list{groupNums == 7})
 % 3. CG brightness btwn stiffest quartile of Ab-injected vs middle quartile of control-injected
 [p h] = ranksum(circMeanList{groupNums == 3}, circMeanList{groupNums == 8})
 % 3. CG brightness btwn softest quartile of Ab-injected vs control-injected
@@ -249,7 +251,7 @@ grid on;
 % and brightness data from microinjection controls (CBA, too soft, viable, or too stiff)
 
 % Group1: embryos from B6 mice (n = 36)
-load('embryoInfoCG.mat');
+load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Embryo\cg_imaging\embryoInfoCG.mat');
 paramToPlot = 'circMeanList';
 
 
@@ -273,7 +275,7 @@ paramTooStiffA = []; % none that were too stiff in this data set
 
 
 % Group2: CBA mice, microinjection experiment controls
-fileToSave = 'data/embryoInfoMicroinjection.mat';
+fileToSave = 'C:/Users/Livia/Desktop/IVF/Processed Data/Mouse Embryo/microinjection_data/embryoInfoMicroinjection.mat';
 load(fileToSave);
 circMeanListB = embryoInfo.circMeanList;
 circStdListB = embryoInfo.circStdList;

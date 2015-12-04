@@ -5,7 +5,7 @@
 %%
 % clear all;
 % close all;
-filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse oocyte analysis\';
+filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse oocyte\';
 
 % whichToPlot(1) is 5-14-13 (M2)
 % whichToPlot(2) is 5-30-13 (M2)
