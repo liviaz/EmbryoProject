@@ -25,7 +25,7 @@ gList = [];
 colorMat = [];
 currE = 0;
 
-ptsToPlot = [1 1 1 1 1 1 1 1];
+ptsToPlot = [1 1 1 1 1 1 1 1 1 1 1];
 aText = [];
 cText = {};
 
@@ -52,16 +52,17 @@ for i = 1:numParticipants
                 taulist = [taulist tau];
                 gList = [gList gender{i}(j)];
                 
-                if outcomeInfo{i}(j)
-                    
-                    colorMat = [colorMat; [0 .6 0]];
-%                     if gender{i}(j) == 1
-%                         colorMat = [colorMat; [0 .6 0]];
-%                     elseif gender{i}(j) == 0
-%                         colorMat = [colorMat; [.9 .4 0]];
-%                     else
-%                         colorMat = [colorMat; [.6 .6 0]];
-%                     end
+                if isnan(outcomeInfo{i}(j)) || (ICSI{i}(j) == 0)
+                    colorMat = [colorMat; [NaN NaN NaN]];
+                elseif outcomeInfo{i}(j)
+                    %colorMat = [colorMat; [0 .6 0]];
+                    if PGD{i}(j) == 1
+                        colorMat = [colorMat; [0 .6 0]];
+                    elseif PGD{i}(j) == 0
+                        colorMat = [colorMat; [.9 .4 0]];
+                    else
+                        colorMat = [colorMat; [.6 .6 0]];
+                    end
                     %                     if ICSI{i}(j) == 1
                     %                         colorMat = [colorMat; [0 .6 0]];
                     %                     else
@@ -77,6 +78,7 @@ for i = 1:numParticipants
                 end
                 
             else
+                colorMat = [colorMat; [NaN NaN NaN]];
                 mList = [mList NaN];
                 k0list = [k0list NaN];
                 k1list = [k1list NaN];
@@ -109,6 +111,8 @@ ylabel('n1 parameter');
 axis([min(p1) max(p1) min(p2) max(p2)]);
 set(gca, 'zscale', 'linear');
 grid on;
+xlim([.3 .7]);
+ylim([0 .8]);
 
 % b = num2str(aText');
 % c = cellstr(b);

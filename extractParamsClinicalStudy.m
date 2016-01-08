@@ -3,11 +3,11 @@
 %
 
 close all;
-pNum = '001';
-date = '';
-embryoNum = '1';
+pNum = '009';
+date = '12-2-15';
+embryoNum = '8';
 
-manualPip = 0;
+manualPip = 1;
 manualCorner = 0;
 manualMeasure = 0;
 filePath = 'C:\Users\Livia\Desktop\IVF\';
@@ -29,8 +29,8 @@ movpath = [filePathRaw '\MECH' pNum '-E' embryoNum '.avi'];
 convFactor = 2.27; % pixels / micron on clinical system
 cropVal = 1; % maximum num seconds to fit to model
 secsToGet = 1.2;
-startFrame = 20;
-cannyThresh = .2;
+startFrame = 28;
+cannyThresh = .08;
 pixelSag = 20;
 
 % read in video
@@ -40,10 +40,10 @@ pixelSag = 20;
 % make new pipette reference if one does not already exist
 if manualPip
     [~, ROIframes] = getROI(newframes, manualCorner, cannyThresh);
-    figure, imshow(ROIframes(:,:,1));
-    [x,y] = ginput(2);
-    close all;
-    pipRefOpeningPixels = round(abs(y(2) - y(1)));
+%     figure, imshow(ROIframes(:,:,1));
+%     [x,y] = ginput(2);
+%     close all;
+%     pipRefOpeningPixels = round(abs(y(2) - y(1)));
 else
     ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, filePathRaw, 1);
     load([filePathRaw '\pipRef.mat']);

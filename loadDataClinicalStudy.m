@@ -3,7 +3,7 @@
 function outputStruct = loadDataClinicalStudy()
 
 outputStruct = struct;
-numParticipants = 8;
+numParticipants = 11;
 participantIDs = cell(1,numParticipants);
 numEmbryos = zeros(1,numParticipants);
 outcomeInfo = cell(1,numParticipants);
@@ -55,7 +55,7 @@ gender{3} = [0 1 0 0 1 1 1 1 0 NaN NaN 0 NaN NaN];
 % all discarded due to poor quality
 participantIDs{4} = 'MECH004';
 numEmbryos(4) = 13;
-outcomeInfo{4} = [zeros(1,11) 1 0];
+outcomeInfo{4} = [1 0 1 0 0 0 0 0 0 0 0 1 0];
 d3M{4} = {'8III', '6III', '8II', '8II', '8I', '4IV', '5III', '6III', ...
     '4IV', '8II', '5III', '8II', '7III'};
 blastM{4} = {'2CC', '', '1CC', '1', '', '', '', '', '', '', '', '5CC', ''};
@@ -86,7 +86,7 @@ PGD{6} = [NaN NaN 1 1 NaN 1 NaN];
 gender{6} = [NaN NaN 1 1 NaN 1 NaN];
 
 % EMECH-007
-% has not had retrieval yet
+% only 1 follicle, exited from study
 participantIDs{7} = 'MECH007';
 numEmbryos(7) = 0;
 outcomeInfo{7} = [];
@@ -100,13 +100,49 @@ gender{7} = [];
 % 11-11-15
 participantIDs{8} = 'MECH008';
 numEmbryos(8) = 11;
-outcomeInfo{8} = [0 0 0 0 1 0 0 0 1 0 0];
+outcomeInfo{8} = [0 0 0 0 1 0 0 0 0 0 0];
 d3M{8} = {'3II', '3II', '8IV', '8II', '9II', '7II', '4V', '8II', ...
     '8II', '7IV', '8I'};
 blastM{8} = {'', '', '', '', '6BB', '', '', '', '1', '', ''};
 ICSI{8} = zeros(1,11);
 PGD{8} = NaN*ones(1,11);
 gender{8} = NaN*ones(1,11);
+
+% EMECH-009
+% 12-2-15
+participantIDs{9} = 'MECH009';
+numEmbryos(9) = 13;
+outcomeInfo{9} = [1 0 1 0 0 1 0 1 1 1 0 0 0];
+d3M{9} = {'7I', '4I', '8I', '7I', '6III', '8I', '8I', '7I', '8I', ...
+    '7I', '8I', '6III', '4IV'};
+blastM{9} = {'5BB', '', '5BC', '1', '', '5BB', '', '6BB', '5AB', ...
+    '5BB', '', '1', ''};
+ICSI{9} = zeros(1,13);
+PGD{9} = NaN*ones(1,13);
+gender{9} = NaN*ones(1,13);
+
+% EMECH-010
+% 11-27-15
+participantIDs{10} = 'MECH010';
+numEmbryos(10) = 6;
+outcomeInfo{10} = [0 NaN 0 1 0 0]; % E3 transferred at D3
+d3M{10} = {'2II', '7II', '7III', '6III', '5II', '6III'};
+blastM{10} = {'', '', '', '3DB', '', ''};
+ICSI{10} = ones(1,6);
+PGD{10} = NaN*ones(1,6);
+gender{10} = NaN*ones(1,6);
+
+% EMECH-011
+% 12-4-15
+% no blasts, all arrested at cleavage stage
+participantIDs{11} = 'MECH011';
+numEmbryos(11) = 9;
+outcomeInfo{11} = [0 0 0 0 0 0 0 0 0];
+d3M{11} = {'', '', '', '', '', '', '', '', ''}; % fill this in
+blastM{11} = {'', '', '', '', '', '', '', '', ''};
+ICSI{11} = zeros(1,9);
+PGD{11} = NaN*ones(1,9);
+gender{11} = NaN*ones(1,9);
 
 outputStruct.numParticipants = numParticipants;
 outputStruct.participantIDs = participantIDs;

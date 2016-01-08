@@ -17,13 +17,13 @@ for i = 1:numFrames
     if s(3) > 1
         % take each frame and make it grayscale
         if flip
-            framesOut(:,:,i) = fliplr(double(rgb2gray(frames(:,:,:,i))))/255;
+            framesOut(:,:,i) = flipud(fliplr(double(rgb2gray(frames(:,:,:,i)))))/255;
         else
             framesOut(:,:,i) = double(rgb2gray(frames(:,:,:,i)))/255;
         end
     else
         if flip
-            framesOut(:,:,i) = fliplr(double(frames(:,:,i)))/255;
+            framesOut(:,:,i) = flipud(fliplr(double(frames(:,:,i))))/255;
         else
             framesOut(:,:,i) = double(frames(:,:,i))/255;
         end
