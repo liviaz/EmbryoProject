@@ -3,7 +3,7 @@
 
 function [] = MakeRoiTemplate(filePathRaw, cannyThresh, displayFig, singleFrame)
 
-if nargin < 3 || isnan(displayFig)
+if nargin < 3 || ~ishandle(displayFig)
     displayFig = figure;
 end
 

@@ -2,13 +2,10 @@
 % boundary, 
 
 function survivalLikelihoods = findSurvivalLikelihoods(decDistTest, ...
-    decDistTrain, mOut, testIndList, methodToUse)
+    decDistTrain, mOut, methodToUse)
 
-train = (testIndList == 1);
-test = ~train;
-
-mTrain = mOut(train);
-mTest = mOut(test);
+mTrain = mOut(mOut < 2); %(decDistTrain > 0);
+mTest = (decDistTest > 0);
 
 % decDistTest corresponds to mTest
 % decDistTrain corresponds to mTrain
@@ -24,27 +21,21 @@ if methodToUse == 1
     % by looking at the relative numbers of viable/non-viable embryos in the
     % training set with decision boundary distances within +/- decInterval
     
-    % want at least 10 embryos in each "bin"
-    decInterval = (max([decDistTest' decDistTrain']) - ...
-        min([decDistTest' decDistTrain'])) / (length(decDistTrain') / 10);
-    
-    survivalLikelihoods = zeros(1,length(mTest));
+    % weighting envelope is 1/10th of total decDistTrain range
+    envelopeWidth = (max(decDistTrain) - min(decDistTrain))/10;
+    survivalLikelihoods = zeros(1,length(decDistTest));
     
     for i = 1:length(mTest)
         
+        % define gaussian envelope centered at curr decDist
+        % then compute locally weighted viability average
         currDist = decDistTest(i);
-        
-        % find embryos in training set with decision distances close to currDist
-        closeDistEmbryos = mTrain(decDistTrain < currDist + decInterval & ...
-            decDistTrain > currDist - decInterval);
-        
-        numPos = length(closeDistEmbryos(closeDistEmbryos == 1));
-        numNeg = length(closeDistEmbryos(closeDistEmbryos == 0));
-        
-        survivalLikelihoods(i) = numPos / (numPos + numNeg);
+        gaussCurrDist = normpdf(decDistTrain, currDist, envelopeWidth);
+        survivalLikelihoods(i) = sum(gaussCurrDist .* mTrain') / ...
+            sum(gaussCurrDist);
         
     end
-
+    
 elseif methodToUse == 2
     
     % ========================================================================
@@ -56,7 +47,9 @@ elseif methodToUse == 2
 %         '+ log(1 + exp(-AB(1)*decDistTest - AB(2))))'], ...
 %         'mTest', 'decDistTest', 'AB');
     
-    [ABout fval] = fminsearch(@(AB) findSigmoidParams(AB, mTrain', decDistTrain), [0 0]);
+
+    options = optimset('display', 'off');
+    ABout = fminsearch(@(AB) findSigmoidParams(AB, mTrain', decDistTrain), [0 0], options);
     
     survivalLikelihoods = ((1 + exp(ABout(1)*decDistTest + ABout(2))).^(-1))';
     

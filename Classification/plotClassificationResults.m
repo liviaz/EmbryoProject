@@ -28,105 +28,131 @@ ColorPredict(m_predict' == 0, :) = repmat([0 .6 .6], length(m_predict) - num_pos
 
 if size(paramsTest,2) > 2
     
-%     hold on;
-%     subplot(1, 2, 1);
-    % make 2 scatter plots
+    % plot individual scatterplot points so I can make legend by color
     figure(fig_handle);
     hold on;
-    h = scatter3(paramsTest(:,1), paramsTest(:,2), paramsTest(:,3), ...
-        100, ColorMat, 'filled');
+    h = cell(1,length(mTest));
+    hLegend = cell(1,2);
+    
+    for i = 1:length(mTest)
+        h{i} = plot3(paramsTest(i,1), paramsTest(i,2), paramsTest(i,3),...
+            'marker', 'o', 'markerfacecolor', ColorMat(i,:), 'markeredgecolor', ...
+            ColorMat(i,:), 'markersize', 10, 'color', 'none');
+        hold on;
+        if isempty(hLegend{mTest(i)+1})
+            hLegend{mTest(i)+1} = h{i};
+        end
+    end
+        
     set(gca, 'FontSize', 14);
-    set(h, 'Marker', 'o');
     title('Actual Viability');
-%     xlabel('k1 parameter');
-%     ylabel('n1 parameter');
-%     zlabel('tau parameter');
     xlim([min(paramsTest(:,1)) max(paramsTest(:,1))+.1]);
     ylim([min(paramsTest(:,2)) max(paramsTest(:,2))+.1]);
     zlim([min(paramsTest(:,3)) max(paramsTest(:,3))+.1]);
     view(152,20);
     grid on;
     axis(axisLims);
+    legend([hLegend{1}, hLegend{2}], {'Nonviable', 'Viable'}, 'Location', 'North');
     
-    hC = flipud(get(h, 'children'));
-    
-    legend([hC(find(mTest == 1, 1, 'first')) ...
-        hC(find(mTest == 0, 1, 'first'))], ...
-        'Viable', 'Nonviable', 'Location', 'North');
-
-%     hold on;
-%     a = currEmbryoNums';
-%     b = num2str(a);
-%     c = cellstr(b);
-%     dx = .05; dy = 0.05; dz = .05; % displacement so the text does not overlay the data points
-%     text(paramsTest(:,1)+dx, paramsTest(:,2)+dy, paramsTest(:,3)+dz, c);
-    
-    figure(fig_handle+1);
+    % plot test results
+    figure(fig_handle.Number+1);
     hold on;
-%     subplot(1, 2, 2);
-%     hold on;
-    h = scatter3(paramsTest(:,1), paramsTest(:,2), paramsTest(:,3), ...
-        100, ColorPredict, 'filled');   
+    
+    h = cell(1,length(m_predict));
+    hLegend = cell(1,2);
+    
+    for i = 1:length(m_predict)
+        h{i} = plot3(paramsTest(i,1), paramsTest(i,2), paramsTest(i,3),...
+            'marker', 'o', 'markerfacecolor', ColorPredict(i,:), 'markeredgecolor', ...
+            ColorPredict(i,:), 'markersize', 10, 'color', 'none');
+        hold on;
+        if isempty(hLegend{m_predict(i)+1})
+            hLegend{m_predict(i)+1} = h{i};
+        end
+    end
+
     set(gca, 'FontSize', 14);
-    set(h, 'Marker', 'o');
     title('SVM Predicted Viability');
-%     xlabel('k1 parameter');
-%     ylabel('n1 parameter');
-%     zlabel('tau parameter');
     xlim([min(paramsTest(:,1)) max(paramsTest(:,1))+.1]);
     ylim([min(paramsTest(:,2)) max(paramsTest(:,2))+.1]);
     zlim([min(paramsTest(:,3)) max(paramsTest(:,3))+.1]);
     view(152,20);
     grid on;
     axis(axisLims);
-    
-    hC = flipud(get(h, 'children'));
-    
-    legend([hC(find(m_predict == 1, 1, 'first')) ...
-        hC(find(m_predict == 0, 1, 'first'))], ...
-        'Predicted Viable', 'Predicted NonViable', 'Location', 'North');
+        
+    legend([hLegend{1}, hLegend{2}], {'Predicted Nonviable', ...
+        'Predicted Viable'}, 'Location', 'North');
+
     
 elseif size(paramsTest,2) == 2
     
+    % plot individual scatterplot points so I can make legend by color
     figure(fig_handle);
     hold on;
-    h = scatter(paramsTest(:,1), paramsTest(:,2), ...
-        100, ColorMat, 'filled');
-    hAxis = get(h,'parent');
-    set(h, 'Marker', 'o');
+    h = cell(1,length(mTest));
+    hLegend = cell(1,2);
+    
+    for i = 1:length(mTest)
+        h{i} = plot(paramsTest(i,1), paramsTest(i,2),...
+            'marker', 'o', 'markerfacecolor', ColorMat(i,:), 'markeredgecolor', ...
+            ColorMat(i,:), 'markersize', 10, 'color', 'none');
+        hold on;
+        if isempty(hLegend{mTest(i)+1})
+            hLegend{mTest(i)+1} = h{i};
+        end
+    end
+        
     set(gca, 'FontSize', 14);
     title('Actual Viability');
-%     xlabel('k1 parameter');
-%     ylabel('\tau parameter');
     xlim([min(paramsTest(:,1)) max(paramsTest(:,1))+.1]);
     ylim([min(paramsTest(:,2)) max(paramsTest(:,2))+.1]);
+    grid on;
     axis(axisLims(1:4));
-
-    hold on;
-    plotSVandDC(embryoClassifier, hAxis, 1, 2, -.2);
-    %         hold on;
-    %         a = currEmbryoNums';
-    %         b = num2str(a);
-    %         c = cellstr(b);
-    %         dx = .025; dy = .025; % displacement so the text does not overlay the data points
-    %         text(paramsTest(:,1)+dx, paramsTest(:,2)+dy, c);
+    legend([hLegend{1}, hLegend{2}], {'Nonviable', 'Viable'}, 'Location', 'North');
     
-    figure(fig_handle+1);
+    % plot SVM decision boundary
+    [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+        linspace(axisLims(3),axisLims(4),100));
+    xGrid = [x1Grid(:),x2Grid(:)];
+    [~,scores] = predict(embryoClassifier,xGrid);
+    contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),[0 0],'k');
+
+    
+    
+    % plot test results
+    figure(fig_handle.Number+1);
     hold on;
-    h = scatter(paramsTest(:,1), paramsTest(:,2), ...
-        100, ColorPredict, 'filled');
-    set(h, 'Marker', 'o');
+    h = cell(1,length(m_predict));
+    hLegend = cell(1,2);
+    
+    for i = 1:length(m_predict)
+        h{i} = plot(paramsTest(i,1), paramsTest(i,2),...
+            'marker', 'o', 'markerfacecolor', ColorPredict(i,:), 'markeredgecolor', ...
+            ColorPredict(i,:), 'markersize', 10, 'color', 'none');
+        hold on;
+        if isempty(hLegend{m_predict(i)+1})
+            hLegend{m_predict(i)+1} = h{i};
+        end
+    end
+
     set(gca, 'FontSize', 14);
     title('SVM Predicted Viability');
-%     xlabel('k1 parameter');
-%     ylabel('\tau parameter');
-    axis(axisLims(1:4));
     xlim([min(paramsTest(:,1)) max(paramsTest(:,1))+.1]);
     ylim([min(paramsTest(:,2)) max(paramsTest(:,2))+.1]);
+    grid on;
+    axis(axisLims(1:4));
+        
+    legend([hLegend{1}, hLegend{2}], {'Predicted Nonviable', ...
+        'Predicted Viable'}, 'Location', 'North');
     
-    hold on;
-    if length(get(gca, 'children')) == 5
-        plotSVandDC(embryoClassifier, hAxis, 1, 2, 0); 
-    end
+    % plot SVM decision boundary
+    [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+        linspace(axisLims(3),axisLims(4),100));
+    xGrid = [x1Grid(:),x2Grid(:)];
+    [~,scores] = predict(embryoClassifier,xGrid);
+    contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),[0 0],'k');
+    
+    
+    
     
 end

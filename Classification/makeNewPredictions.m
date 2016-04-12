@@ -1,35 +1,18 @@
 %
-%   Inputs: testIndList tells which embryos are to be used in the training
-%                       set to build the classifier (testIndList = 1) 
-%                       and for which ones the morphology needs to be
-%                       predicted (testIndList = 2)
+%   Inputs: 
 %
 %           mOut        has the ground truth data for all the embryos to be
-%                       used in the training set and an arbitrary value
-%                       (like 5 or something) for embryos to be predicted
+%                       used in the training set (0 for negative group, 1 
+%                       for positive group) and 2 for embryos to be predicted
 %       
 %           paramsOut   is the list of parameters for all the embryos (all
 %                       the embryos in the training and test sets together)
 %
-%           numParams   is the number of parameters in the classifier
-%
-%           nGoodSelect tells the function to return the "nGoodSelect" best
-%                       embryos as predicted by the classifier
-%
-%           nBadSelect  tells the function to return the "nBadSelect" worst
-%                       embryos
-%
-%   Outputs: worstEmbryos   are the indices of the nBadSelect worst embryos
-%                           as predicted by the classifier
-%
-%            bestEmbryos    are the indices of the nGoodSelect best embryos 
-%                           as predicted by the classifier
-%   
-%            m_predict      are the predicted viability values of all the
-%                           newly measured embryos
 %
 %
-%            decDist        is the distance from the decision boundary for
+%   Outputs: 
+%
+%            decDistTest    is the distance from the decision boundary for
 %                           each embryo in the test set, gives a measure of
 %                           the confidence of the predicted viability for
 %                           each
@@ -37,146 +20,157 @@
 %                           each embryo in the training set in order to
 %                           predict likelihood of surviving for new embryos
 
-function [worstEmbryos, bestEmbryos, m_predict, decDist, decDistTrain] = ...
-    makeNewPredictions(testIndList, mOut, paramsOut, ...
-    nGoodSelect, nBadSelect, fig_handle, enumList)
+function [decDistTest, decDistTrain] = makeNewPredictions(params, m, fig_handle, plotInput)
 
-train = (testIndList == 1);
-test = ~train;
 
-mTrain = mOut(train);
-mTest = mOut(test);
+paramsTrain = params(m < 2,:);
+paramsTest = params(m == 2, :);
+mTrain = m(m < 2);
+mTest = m(m == 2);
 
-% the text below is already built into paramsOut
+embryoClassifier = fitcsvm(paramsTrain, mTrain, 'ResponseName', 'Viability', ...
+    'KernelFunction', 'rbf', 'Standardize', true);
+[mTrainPredict, decDistTrainPredict] = predict(embryoClassifier, paramsTrain);
+decDistTrain = decDistTrainPredict(:,2);
 
-% % define list of parameters for embryos in each set
-% % each is an numEmbryos x numParams matrix
-% if numParams == 4
-%     paramsTrain = paramsOut(train,:);
-%     paramsTest = paramsOut(test,:);
-% elseif numParams == 3
-%     paramsTrain = paramsOut(train,1:3);
-%     paramsTest = paramsOut(test,1:3);
-% elseif numParams == 2
-%     paramsTrain = paramsOut(train,1:2);
-%     paramsTest = paramsOut(test,1:2);
-% elseif numParams == 1
-%     paramsTrain = paramsOut(train,1);
-%     paramsTest = paramsOut(test,1);
-% end
+[mTestPredict, decDistTestPredict] = predict(embryoClassifier, paramsTest);
+decDistTest = decDistTestPredict(:,2);
 
-% optimize SVM params
-posGroup = paramsOut(mOut == 1,:)';
-negGroup = paramsOut(mOut == 0,:)';
-
-zIn = OptimizeSvmParams(posGroup, ...
-    negGroup, ...
-    ones(1,size(posGroup,2)), ...
-    ones(1,size(negGroup,2)), ...
-    10, 'rbf', log([1 .5]), [5 5]);
-
-paramsTrain = paramsOut(train,:);
-paramsTest = paramsOut(test,:);
-
-% make classifier and find predicted viability
-%     figure(fig_handle_2);
-embryoClassifier = svmtrain(paramsTrain, mTrain, 'kernel_function', ...
-    'rbf', 'rbf_sigma', zIn(2), 'boxconstraint', zIn(1), 'method', 'smo');
-
-% calculate predicted viability for test set
-[m_predict, decDist] = svmclassify(embryoClassifier, paramsTest, ...
-    'showplot', false);
-
-% calculate distances from decision boundary for embryos in training set
-[~, decDistTrain] = svmclassify(embryoClassifier, paramsTrain);
-
-% highlight embryos furthest from decision boundary
-[~, inds] = sort(decDist, 'ascend');
-worstEmbryos = inds(end-nBadSelect+1:end)';
-bestEmbryos = inds(1:nGoodSelect)';
-
-% plot them along with embryos in training set
-if size(paramsOut,2) > 2
+% plot to compare actual vs predicted (optional)
+if plotInput
     
-    % plot all embryos in training set
-    figure(fig_handle);
-    ColorMat = zeros(length(mTrain), 3);
+    if ~ishandle(fig_handle)
+        fig_handle = figure;
+    end
+    
+    if size(params,2) < 3
+        axisLims = [min(params(:,1)) max(params(:,1)) ...
+            min(params(:,2)) max(params(:,2))];
+    else
+        axisLims = [min(params(:,1)) max(params(:,1)) ...
+            min(params(:,2)) max(params(:,2)) ...
+            min(params(:,3)) max(params(:,3))];
+    end
+    
+    % plot results
+    % green and blue for actual
+    ColorTrain = zeros(length(mTrain), 3);
     num_pos = length(mTrain(mTrain == 1));
-    ColorMat(mTrain == 1, :) = repmat([0 .6 0], num_pos, 1);
-    ColorMat(mTrain == 0, :) = repmat([0 0 .6], length(mTrain) - num_pos, 1);
-    hold on;
-    scatter3(paramsTrain(:,1), paramsTrain(:,2), paramsTrain(:,3), ...
-        100, ColorMat, 'filled');
+    ColorTrain(mTrain == 1, :) = repmat([0 .6 0], num_pos, 1);
+    ColorTrain(mTrain == 0, :) = repmat([0 0 .6], length(mTrain) - num_pos, 1);
     
-    % overlay test embryos
-    figure(fig_handle);
-    hold on;
-    % predicted worst
-    scatter3(paramsTest(inds(end-nBadSelect+1:end),1), ...
-        paramsTest(inds(end-nBadSelect+1:end),2), ...
-        paramsTest(inds(end-nBadSelect+1:end),3), 100, [0 .6 .6], 'filled');
-    hold on;
-    % predicted best
-    scatter3(paramsTest(inds(1:nGoodSelect),1), ...
-        paramsTest(inds(1:nGoodSelect),2), ...
-        paramsTest(inds(1:nGoodSelect),3), 100, [.7 .7 0], 'filled');
-    hold on;
-    % middle
-    scatter3(paramsTest(inds(nGoodSelect+1:end-nBadSelect), 1), ...
-        paramsTest(inds(nGoodSelect+1:end-nBadSelect), 2), ...
-        paramsTest(inds(nGoodSelect+1:end-nBadSelect), 3), 100, [0 0 .6]);
-    grid on;
-    view(152, 20);
+    % orange and light blue for predicted ones
+    ColorTest = zeros(length(mTestPredict), 3);
+    num_pos = length(mTestPredict(mTestPredict == 1));
+    ColorTest(mTestPredict == 1, :) = repmat([.85 .65 .2], num_pos, 1);
+    ColorTest(mTestPredict == 0, :) = repmat([.2 .6 .9], length(mTestPredict) - num_pos, 1);
     
-    hold on;
+    % choose 3d or 2d plot
+    if size(params,2) > 2
         
-    a = enumList';
-    b = num2str(a)
-    c = cellstr(b);
-    dx = .05; dy = 0.05; dz = .05; % displacement so the text does not overlay the data points
-    text(paramsTest(a,1)+dx, paramsTest(a,2)+dy, paramsTest(a,3)+dz, c);
+        % plot individual scatterplot points so I can make legend by color
+        figure(fig_handle);
+        hold on;
+        hTrain = cell(1,length(mTrain));
+        hTest = cell(1,length(mTest));
+        hLegend = cell(1,4);
+        
+        for i = 1:length(mTrain)
+            hTrain{i} = plot3(paramsTrain(i,1), paramsTrain(i,2), paramsTrain(i,3),...
+                'marker', 'o', 'markerfacecolor', ColorTrain(i,:), 'markeredgecolor', ...
+                ColorTrain(i,:), 'markersize', 10, 'color', 'none');
+            if isempty(hLegend{mTrain(i)+1})
+                hLegend{mTrain(i)+1} = hTrain{i};
+            end
+        end
+        
+        for i = 1:length(mTestPredict)
+            hTest{i} = plot3(paramsTest(i,1), paramsTest(i,2), paramsTest(i,3),...
+                'marker', 'o', 'markerfacecolor', ColorTest(i,:), 'markeredgecolor', ...
+                ColorTest(i,:), 'markersize', 15, 'color', 'none');
+            text(paramsTest(i,1), paramsTest(i,2), paramsTest(i,3), num2str(i));
+            if isempty(hLegend{mTestPredict(i)+3})
+                hLegend{mTestPredict(i)+3} = hTest{i};
+            end
+        end
+        
+        set(gca, 'FontSize', 14);
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        zlim([min(params(:,3)) max(params(:,3))+.1]);
+        view(152,20);
+        grid on;
+        axis(axisLims);
+        legend([hLegend{1}, hLegend{2}, hLegend{3}, hLegend{4}], ...
+            {'Nonviable', 'Viable', 'Predicted nonviable', 'Predicted viable'}, ...
+            'Location', 'North');
+        
+    else
+      
+        % plot individual scatterplot points so I can make legend by color
+        figure(fig_handle);
+        hold on;
+        hTrain = cell(1,length(mTrain));
+        hTest = cell(1,length(mTest));
+        hLegend = cell(1,4);
+        
+        for i = 1:length(mTrain)
+            hTrain{i} = plot(paramsTrain(i,1), paramsTrain(i,2),...
+                'marker', 'o', 'markerfacecolor', ColorTrain(i,:), 'markeredgecolor', ...
+                ColorTrain(i,:), 'markersize', 10, 'color', 'none');
+            if isempty(hLegend{mTrain(i)+1})
+                hLegend{mTrain(i)+1} = hTrain{i};
+            end
+        end
+        
+        for i = 1:length(mTestPredict)
+            hTest{i} = plot(paramsTest(i,1), paramsTest(i,2),...
+                'marker', 'o', 'markerfacecolor', ColorTest(i,:), 'markeredgecolor', ...
+                ColorTest(i,:), 'markersize', 15, 'color', 'none');
+            text(paramsTest(i,1), paramsTest(i,2), num2str(i));
+            if isempty(hLegend{mTestPredict(i)+3})
+                hLegend{mTestPredict(i)+3} = hTest{i};
+            end
+        end
+        
+        set(gca, 'FontSize', 14);
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        grid on;
+        axis(axisLims);
+        legend([hLegend{1}, hLegend{2}, hLegend{3}, hLegend{4}], ...
+            {'Nonviable', 'Viable', 'Predicted nonviable', 'Predicted viable'}, ...
+            'Location', 'North');
+        
+        % plot SVM decision boundary
+        [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+            linspace(axisLims(3),axisLims(4),100));
+        xGrid = [x1Grid(:),x2Grid(:)];
+        [~,scores] = predict(embryoClassifier,xGrid);
+        scoresR = reshape(scores(:,2),size(x1Grid));
+        C = contour(x1Grid,x2Grid,scoresR,0*ones(1,2),'k', 'linewidth', 2);
+        
+        % recalculate decision boundary as distance from 0 contour
+        contourDistTest = zeros(1,length(decDistTest));
+        contourDistTrain = zeros(1,length(decDistTrain));
+        
+        for i = 1:length(decDistTest)
+            paramDiffZeroContour = C' - repmat(paramsTest(i,:), size(C,2), 1);
+            distFromZeroContour = sqrt(paramDiffZeroContour(:,1).^2 + paramDiffZeroContour(:,2).^2);
+            contourDistTest(i) = sign(decDistTest(i))*min(distFromZeroContour);
+        end
+        
+        for i = 1:length(decDistTrain)
+            paramDiffZeroContour = C' - repmat(paramsTrain(i,:), size(C,2), 1);
+            distFromZeroContour = sqrt(paramDiffZeroContour(:,1).^2 + paramDiffZeroContour(:,2).^2);
+            contourDistTrain(i) = sign(decDistTrain(i))*min(distFromZeroContour);
+        end
+        
+        % for 2D only
+        decDistTest = contourDistTest';
+        decDistTrain = contourDistTrain';
+        
+    end
     
-    
-elseif size(paramsOut,2) == 2
-    
-    % plot all embryos in training set
-    figure(fig_handle);
-    ColorMat = zeros(length(mTrain), 3);
-    num_pos = length(mTrain(mTrain == 1));
-    ColorMat(mTrain == 1, :) = repmat([0 .6 0], num_pos, 1);
-    ColorMat(mTrain == 0, :) = repmat([0 0 .6], length(mTrain) - num_pos, 1);
-    hold on;
-    scatter(paramsTrain(:,1), paramsTrain(:,2), ...
-        100, ColorMat, 'filled');
-    
-    % overlay test embryos
-    figure(fig_handle);
-    hold on;
-    % predicted worst
-    h = scatter(paramsTest(inds(end-nBadSelect+1:end),1), ...
-        paramsTest(inds(end-nBadSelect+1:end),2), ...
-        100, [0 .6 .6], 'filled');
-    hAxis = get(h,'parent');
-    hold on;
-    % predicted best
-    scatter(paramsTest(inds(1:nGoodSelect),1), ...
-        paramsTest(inds(1:nGoodSelect),2), ...
-        100, [.7 .7 0], 'filled');
-    hold on;
-    % middle
-    scatter(paramsTest(inds(nGoodSelect+1:end-nBadSelect), 1), ...
-        paramsTest(inds(nGoodSelect+1:end-nBadSelect), 2), ...
-        100, [0 0 .6]);
-    grid on;
-    
-    hold on;
-    a = enumList';
-    b = num2str(a);
-    c = cellstr(b);
-    dx = .01; dy = 0.01; % displacement so the text does not overlay the data points
-    text(paramsTest(a,1)+dx, paramsTest(a,2)+dy, c);
-    
-    hold on;
-    plotSVandDC(embryoClassifier, hAxis, 1, 2, 0);
     
 end

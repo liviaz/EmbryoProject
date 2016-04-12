@@ -9,7 +9,7 @@ currCellFrame = 1;
 foundCell = 0;
 manual_depth = zeros(1,5);
 
-if nargin < 4
+if nargin < 4 || ~ishandle(extraFig)
     fig = figure;
 else
     fig = extraFig;
@@ -142,6 +142,7 @@ for i = 1:maxI
     yBest = yBest/scaleFactor;
     
     figure(fig);
+    pause(.1);
     imshow(RF, 'InitialMagnification', 400);
     hold on;
     line(scaleFactor*[xBest xBest], scaleFactor*[currY-80 currY+80], 'color', [1 1 0], 'linewidth', 2);

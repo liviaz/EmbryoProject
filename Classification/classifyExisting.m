@@ -1,167 +1,190 @@
-%
-% if crossValidate = 1, predictOut and decDistOut are the same length as
-% mOut. If crossValidate = 0, predictOut and decDistOut are only as long as
-% the test group, as indicated by where testIndList = 2
+% Perform cross-validation on existing data
 %
 %
 
-function [predictOut, decDistOut, zOut] = classifyExisting(testIndList, mOut, ...
-    paramsOut, fig_handle, crossValidate, nGroups, plotInput, optimFlag, zIn)
+function [predictOut, decDistOut, fig_handle] = classifyExisting(params, m, fig_handle, plotInput)
 
 % ======================================================
 % Perform cross-validation between the n groups
 % ======================================================
 
-% close all;
-% create class performance object
-cpEmbryos = classperf(mOut, 'positive', 1, 'negative', 0);
+% train SVM classifier with 10-fold cross-validation
+% make predictions and return decision boundary distances
 
-% sigma is 1
-% C is .001
-% fig_handle_2 = figure;
+bestSigma = .2; % findBestSVMParams(params, m);
 
-if crossValidate
+embryoClassifier = fitcsvm(params, m, 'ResponseName', 'Viability', ...
+    'KernelFunction', 'rbf', 'Standardize', true, 'CrossVal', 'on');%, 'KernelScale', bestSigma);
+[predictOut, decDist] = kfoldPredict(embryoClassifier);
+decDistOut = decDist(:,2);
+
+
+% plot to compare actual vs predicted (optional)
+if plotInput
     
-    % vector to save all predictions in
-    predict_all = zeros(1,length(mOut));
-    decDist_all = zeros(1,length(mOut));
+    if ~ishandle(fig_handle)
+        fig_handle = figure;
+    end
     
-    for i = 1:nGroups
+    if size(params,2) < 3
+        axisLims = [min(params(:,1)) max(params(:,1)) ...
+            min(params(:,2)) max(params(:,2))];
+    else
+        axisLims = [min(params(:,1)) max(params(:,1)) ...
+            min(params(:,2)) max(params(:,2)) ...
+            min(params(:,3)) max(params(:,3))];
+    end
+    
+    % plot results
+    % green and blue for actual
+    ColorMat = zeros(length(m), 3);
+    num_pos = length(m(m == 1));
+    ColorMat(m == 1, :) = repmat([0 .6 0], num_pos, 1);
+    ColorMat(m == 0, :) = repmat([0 0 .6], length(m) - num_pos, 1);
+    
+    % orange and light blue for predicted ones
+    ColorPredict = zeros(length(predictOut), 3);
+    num_pos = length(predictOut(predictOut == 1));
+    ColorPredict(predictOut' == 1, :) = repmat([.85 .65 .2], num_pos, 1);
+    ColorPredict(predictOut' == 0, :) = repmat([.2 .6 .9], length(predictOut) - num_pos, 1);
+    
+    % choose 3d or 2d plot
+    if size(params,2) > 2
         
-        if optimFlag && i == 1
-            
-            % just set a value for rbf_sigma and C, don't optimize
-            
-                        posGroup = paramsOut(mOut == 1,:)';
-                        negGroup = paramsOut(mOut == 0,:)';
-            
-%                         zOut = OptimizeSvmParams(posGroup, ...
-%                             negGroup, ...
-%                             ones(1,size(posGroup,2)), ...
-%                             ones(1,size(negGroup,2)), ...
-%                             nGroups, 'rbf', log([1 .6]), [5 5]);
-                        
-%                         zOut = OptimizeSvmParams(posGroup, ...
-%                             negGroup, ...
-%                             ones(1,size(posGroup,2)), ...
-%                             ones(1,size(negGroup,2)), ...
-%                             nGroups, 'rbf', [1 .6], [2 2]);
-            
-            zOut = [1 .7];
-            zIn = zOut;
-            rbf_sigma = zOut(2);
-            C = zOut(1);
-            
-        else
-            rbf_sigma = zIn(2);
-            C = zIn(1);
-            zOut = zIn;
-        end
-
-        test = (testIndList == i);
-        train = ~test;
+        % plot individual scatterplot points so I can make legend by color
+        figure(fig_handle);
+        subplot(1,2,1);
+        hold on;
+        h = cell(1,length(m));
+        hLegend = cell(1,2);
         
-        mTrain = mOut(train);
-        mTest = mOut(test);
-        
-        % define list of parameters for embryos in each set
-        % each is an nEmbryos x numParams matrix
-        paramsTrain = paramsOut(train, :);
-        paramsTest = paramsOut(test, :);
-        
-        % make classifier and find predicted viability
-        %     figure(fig_handle_2);
-        
-        embryoClassifier = svmtrain(paramsTrain, mTrain, 'kernel_function', ...
-            'rbf', 'rbf_sigma', rbf_sigma, 'boxconstraint', C, ...
-            'showplot', false, 'method', 'smo', 'autoscale', true);
-        [m_predict, decDist] = svmclassify(embryoClassifier, paramsTest, ...
-            'showplot', false);
-        predict_all(test) = decDist < 0;
-        decDist_all(test) = decDist;
-       
-        
-        if plotInput
-            
-            if size(paramsOut,2) < 3
-                axisLims = [0 1 0 1 0 1];
-            else
-                axisLims = [min(paramsOut(:,1)) max(paramsOut(:,1)) ...
-                    min(paramsOut(:,2)) max(paramsOut(:,2)) ...
-                    min(paramsOut(:,3)) max(paramsOut(:,3))];
+        for i = 1:length(m)
+            h{i} = plot3(params(i,1), params(i,2), params(i,3),...
+                'marker', 'o', 'markerfacecolor', ColorMat(i,:), 'markeredgecolor', ...
+                ColorMat(i,:), 'markersize', 10, 'color', 'none');
+            hold on;
+            if isempty(hLegend{m(i)+1})
+                hLegend{m(i)+1} = h{i};
             end
-            
-            % plot results
-            plotClassificationResults(mTest, decDist, paramsTest, fig_handle, ...
-                embryoClassifier, axisLims);
         end
+        
+        set(gca, 'FontSize', 14);
+        title('Actual Viability');
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        zlim([min(params(:,3)) max(params(:,3))+.1]);
+        view(152,20);
+        grid on;
+        axis(axisLims);
+        legend([hLegend{1}, hLegend{2}], {'Nonviable', 'Viable'}, 'Location', 'North');
+        
+        
+        subplot(1,2,2);
+        hold on;
+        
+        h = cell(1,length(predictOut));
+        hLegend = cell(1,2);
+        
+        for i = 1:length(predictOut)
+            h{i} = plot3(params(i,1), params(i,2), params(i,3),...
+                'marker', 'o', 'markerfacecolor', ColorPredict(i,:), 'markeredgecolor', ...
+                ColorPredict(i,:), 'markersize', 10, 'color', 'none');
+            hold on;
+            if isempty(hLegend{predictOut(i)+1})
+                hLegend{predictOut(i)+1} = h{i};
+            end
+        end
+        
+        set(gca, 'FontSize', 14);
+        title('SVM Predicted Viability');
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        zlim([min(params(:,3)) max(params(:,3))+.1]);
+        view(152,20);
+        grid on;
+        axis(axisLims);
+        
+        legend([hLegend{1}, hLegend{2}], {'Predicted Nonviable', ...
+            'Predicted Viable'}, 'Location', 'North');
+        
+    else
+      
+        % plot individual scatterplot points so I can make legend by color
+        figure(fig_handle);
+        subplot(1,2,1);
+        hold on;
+        h = cell(1,length(m));
+        hLegend = cell(1,2);
+        
+        for i = 1:length(m)
+            h{i} = plot(params(i,1), params(i,2),...
+                'marker', 'o', 'markerfacecolor', ColorMat(i,:), 'markeredgecolor', ...
+                ColorMat(i,:), 'markersize', 10, 'color', 'none');
+            hold on;
+            if isempty(hLegend{m(i)+1})
+                hLegend{m(i)+1} = h{i};
+            end
+        end
+        
+        set(gca, 'FontSize', 14);
+        title('Actual Viability');
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        grid on;
+        axis(axisLims);
+        legend([hLegend{1}, hLegend{2}], {'Nonviable', 'Viable'}, 'Location', 'North');
+        
+        % plot SVM decision boundary
+        embryoClassifierTrainAll = fitcsvm(params, m, 'ResponseName', ...
+            'Viability', 'KernelFunction', 'rbf', 'Standardize', true);%, 'KernelScale', bestSigma);
+        [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+            linspace(axisLims(3),axisLims(4),100));
+        xGrid = [x1Grid(:),x2Grid(:)];
+        [~,scores] = predict(embryoClassifierTrainAll,xGrid);
+        contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),-.0*ones(1,2),'k');
+
+        
+        subplot(1,2,2);
+        hold on;
+        
+        h = cell(1,length(predictOut));
+        hLegend = cell(1,2);
+        
+        for i = 1:length(predictOut)
+            h{i} = plot(params(i,1), params(i,2),...
+                'marker', 'o', 'markerfacecolor', ColorPredict(i,:), 'markeredgecolor', ...
+                ColorPredict(i,:), 'markersize', 10, 'color', 'none');
+            hold on;
+            if isempty(hLegend{predictOut(i)+1})
+                hLegend{predictOut(i)+1} = h{i};
+            end
+        end
+        
+        set(gca, 'FontSize', 14);
+        title('SVM Predicted Viability');
+        xlim([min(params(:,1)) max(params(:,1))+.1]);
+        ylim([min(params(:,2)) max(params(:,2))+.1]);
+        grid on;
+        axis(axisLims);
+        
+        legend([hLegend{1}, hLegend{2}], {'Predicted Nonviable', ...
+            'Predicted Viable'}, 'Location', 'North');
+        
+%         % plot SVM decision boundary
+%         embryoClassifierTrainAll = fitcsvm(params, m, 'ResponseName', ...
+%             'Viability', 'KernelFunction', 'rbf', 'KernelScale', bestSigma);
+%         [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+%             linspace(axisLims(3),axisLims(4),100));
+%         xGrid = [x1Grid(:),x2Grid(:)];
+%         [~,scores] = predict(embryoClassifierTrainAll,xGrid);
+%         contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),[0 0],'k');
+
         
     end
     
-%     % account for NaNs
-%     mOut
-%     predict_all
-%     mOut(isnan(predict_all)) = NaN;
-    
-    true_pos = length(mOut(mOut == 1 & predict_all == 1));
-    false_pos = length(mOut(mOut == 0 & predict_all == 1));
-    true_neg = length(mOut(mOut == 0 & predict_all == 0));
-    false_neg = length(mOut(mOut == 1 & predict_all == 0));
-    
-    sensitivity = true_pos / (true_pos + false_neg)
-    specificity = true_neg / (true_neg + false_pos)
-    ppv = true_pos / length(predict_all(predict_all == 1))
-    
-%     classperf(cpEmbryos, predict_all) 
-    predictOut = predict_all;
-    decDistOut = decDist_all;
-    
-else
-    
-    % if not doing cross-validation, just do the classification once 
-    test = (testIndList == 1);
-    train = ~test;
-    
-    mTrain = mOut(train);
-    mTest = mOut(test);
-    
-    C = zIn(1);
-    rbf_sigma = zIn(2);
-    zOut = zIn;
-    
-    % define list of parameters for embryos in each set
-    % each is an nx3 matrix
-    paramsTrain = paramsOut(train, :);
-    paramsTest = paramsOut(test, :);
-    
-    % make classifier and find predicted viability
-    %     figure(fig_handle_2);
-    embryoClassifier = svmtrain(paramsTrain, mTrain, 'kernel_function', ...
-        'rbf', 'rbf_sigma', rbf_sigma, 'boxconstraint', C, ...
-        'showplot', false);
-    [m_predict, decDist] = svmclassify(embryoClassifier, paramsTest, ...
-        'showplot', false);
-    
-    if plotInput
-        % plot results
-        plotClassificationResults(mTest, decDist, paramsTest, fig_handle, ...
-            embryoClassifier);
-    end
-    
-    size(mTest)
-    size(m_predict)
-    
-    true_pos = length(mTest(mTest == 1 & m_predict' == 1));
-    false_pos = length(mTest(mTest == 0 & m_predict' == 1));
-    true_neg = length(mTest(mTest == 0 & m_predict' == 0));
-    false_neg = length(mTest(mTest == 1 & m_predict' == 0));
-    
-    sensitivity = true_pos / (true_pos + false_neg)
-    specificity = true_neg / (true_neg + false_pos)
-    ppv = true_pos / length(m_predict(m_predict == 1))
-    
-    classperf(cpEmbryos, m_predict', test) 
-    predictOut = m_predict';
-    decDistOut = decDist;
     
 end
+
+
+
+

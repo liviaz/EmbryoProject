@@ -1,12 +1,13 @@
 %
 %   Procedure for measuring embryos and making predictions
 %
-%   1. Run depthDetectionAll to measure all embryos
+%   1. Measure embryo mechanics (with depthDetectionAll or another script)
 %
-%   2. Edit saveNewMorphology to add in new experiment with value "5" for
-%      all new (unknown ground truth) embryos
+%   2. Edit saveNewMorphology or loadDataClinicalStudy to add in new 
+%      experiment with value "5" for all new (unknown ground truth) embryos
+%      
 %
-%   3. Edit loadSVMdata
+%   3. Edit loadSVMdata or loadSVMdataClinical
 %
 %   4. Run this function with inputMethod = 2 and nGroups = 2
 %
@@ -21,8 +22,7 @@
 function [AUC_ROC, AUC_PR, zSVM, aROCstd, aPRstd, Ytotal, Ztotal, decDistTest] = ...
     classifyEmbryos(inputMethod, nGroups, method, paramNumsToUse, numRepeats, plotInput)
 
-% close all;
-% clear all;
+close all;
 
 if nargin < 4
     paramNumsToUse = 1:3;
@@ -34,20 +34,18 @@ if nargin < 6
     plotInput = 0;
 end
 
-addpath('C:\Users\Livia\Desktop\IVF\Code\Matlab Code');
-addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection\Livia');
-addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection');
+addpath('..');
+% addpath('C:\Users\Livia\Desktop\IVF\Code\Matlab Code');
+% addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection\Livia');
+% addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection');
 
 if isequal(method, 'human embryo')
-    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human analysis\';
+    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human\';
 elseif isequal(method, 'mouse oocyte')
-    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse oocyte analysis\';
+    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\';
 else % mouse embryo
-    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
+    filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Embryo\';
 end
-
-% inputMethod = 1;
-% nGroups = 5;
 
 Xref = 0:.01:1;
 zSVM = [0 0];
@@ -79,7 +77,10 @@ for j = 1:numRepeats
     j
     %% first load data to be used for classification
     
-    if isequal(method, 'human embryo')
+    if isequal(method, 'clinical')
+        [mOut, paramsOut, testIndList, enumList] = loadSVMdataClinical(inputMethod, nGroups, ...
+            paramNumsToUse);
+    elseif isequal(method, 'human embryo')
         saveNewMorphology('human');
         [mOut, paramsOut, testIndList, enumList] = loadSVMdataHuman(inputMethod, nGroups, 0, ...
             filePath1, paramNumsToUse);
@@ -97,66 +98,47 @@ for j = 1:numRepeats
     
     %% Make predictions about test group
     
-    nGoodSelect = 6;
-    nBadSelect = 6;
-    
     if inputMethod == 2
         
         % make predictions about newly measured embryos
-        [worstEmbryos, bestEmbryos, m_predict, decDistTest, decDistTrain] = ...
-            makeNewPredictions(testIndList, mOut, paramsOut, ...
-            nGoodSelect, nBadSelect, fig_handle, enumList);%, [.4 1.6]);
-        
-        decDistTest
-        
-        worstEmbryos = sort(worstEmbryos)
-        bestEmbryos = sort(bestEmbryos)
+        % neg class has label 0, pos class has label 1, test class has
+        % label 2
+        [decDistTest, decDistTrain] = makeNewPredictions(paramsOut, mOut, fig_handle, plotInput);
         
         % find likelihood of each "test" embryo surviving
         survivalLikelihoods = findSurvivalLikelihoods(decDistTest, ...
-            decDistTrain, mOut, testIndList, 2);
-        
+            decDistTrain, mOut, 2);
+
         % find best and worst embryos with this method
-        [survivalSort, sInd] = sort(survivalLikelihoods, 'ascend');
-        worstEmbryos2 = sInd(1:nBadSelect);
-        bestEmbryos2 = sInd(end-nGoodSelect+1:end);
+        nToTest = 1:length(mOut(mOut == 2));
+        [survivalSort, sInd] = sort(survivalLikelihoods, 'descend');
+        nSort = nToTest(sInd);
         
-        % finally, display
-        fprintf('\n Embryos Least Likely to Survive:');
-        worstEmbryos2
+        % display ranking + likelihood of viability
+        fprintf('\nEmbryo ranking from most to least viable: \n');
+        for i = 1:length(nSort)
+            fprintf('%d, ', nSort(i));
+        end
         
-        fprintf('\n Survival Likelihoods of Least Viable Embryos:');
-        survivalLikelihoods(worstEmbryos2)
+        fprintf('\n\nLikelihood of blastocyst formation: \n');
+        for i = 1:length(nSort)
+            fprintf('%f, ', survivalSort(i));
+        end
         
-        fprintf('\n Embryos Most Likely to Survive:');
-        bestEmbryos2
-        
-        fprintf('\n Survival Likelihoods of Most Viable Embryos:');
-        survivalLikelihoods(bestEmbryos2)
-        
-        zSVM = [0 0];
-        
+        fprintf('\n \n');
+
         
     elseif inputMethod == 1
-        
-        crossValidate = 1;
-        
+                
         % do cross-validation on data set that already has ground truth
-        [~, decDistTest, zSVM] = classifyExisting(testIndList, mOut, ...
-            paramsOut, fig_handle, crossValidate, nGroups, plotInput, (j == 1), zSVM);
+        [~, decDistTest, ~] = classifyExisting(paramsOut, mOut, ...
+            fig_handle, plotInput);
         
         %% Plot ROC curves
         
-        % AUC = .85
-        % AUC of precision recall curve is .93
-        if crossValidate
-            [X, Y, T, AUC] = perfcurve(mOut, -decDistTest, 1);
-            prevalence = length(mOut(mOut == 1)) / length(mOut);
-        else
-            mTrue = mOut(testIndList == 1);
-            [X, Y, T, AUC] = perfcurve(mTrue, -decDistTest, 1);
-            prevalence = length(mTrue(mTrue == 1)) / length(mTrue);
-        end
+        [X, Y, T, AUC] = perfcurve(mOut, decDistTest, 1);
+        prevalence = length(mOut(mOut == 1)) / length(mOut);
+
         
         % get Yi out with points at a standard set of locations (at Xref)
         % otherwise finding average ROC curve isn't really possible

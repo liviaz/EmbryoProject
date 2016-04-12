@@ -86,6 +86,7 @@ setappdata(handles.GUI, 'plotFig', figure(2));
 setappdata(handles.GUI, 'extraFig', figure(3));
 setappdata(handles.GUI, 'zpEnter', 0);
 setappdata(handles.GUI, 'cellEnter', 0);
+setappdata(handles.GUI, 'alreadyCropped', 0);
 
 close(1);
 close(2);
@@ -202,13 +203,8 @@ displayFig = getappdata(handles.GUI, 'displayFig');
 
 if ~ishandle(displayFig)
     
-    if isnan(displayFig)
-        fig = figure(1);
-        setappdata(handles.GUI, 'displayFig', fig);
-    else
-        figure(displayFig);
-    end
-    
+    fig = figure(1);
+    setappdata(handles.GUI, 'displayFig', fig);
     clf;
     frames = getappdata(handles.GUI, 'frames');
     imshow(frames(:,:,1));
@@ -282,9 +278,10 @@ filePathProc = getappdata(handles.GUI, 'filePathProc');
 procFileName = params.procFileName;
 extraFig = getappdata(handles.GUI, 'extraFig');
 startFrame = getappdata(handles.GUI, 'currFrame');
+alreadyCropped = getappdata(handles.GUI, 'alreadyCropped');
 
 % 1. Get ROI around just pipette opening
-[ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw);
+[ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw, alreadyCropped);
 
 if exist([filePathRaw '\pipRef.mat'], 'file')
     set(handles.PipRefIndicator, 'String', 'YES');
@@ -296,13 +293,15 @@ params.sROI = sROI;
 setappdata(handles.GUI, 'params', params);
 setappdata(handles.GUI, 'frames', ROIframes);
 setappdata(handles.GUI, 'extraFig', extraFig);
+setappdata(handles.GUI, 'alreadyCropped', 1);
 clear frames;
 
 % 2. Measure params from aspiration depth
-paramsFit = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
+[paramsFit, extraFig] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
     manualMeasure, filePathProc, procFileName, handles, extraFig, startFrame);
 
 setappdata(handles.GUI, 'paramsFit', paramsFit);
+setappdata(handles.GUI, 'extraFig', extraFig);
 
 % 3. Display in GUI
 set(handles.k1_box, 'String', sprintf('%0.3f',paramsFit.k1));
@@ -341,6 +340,7 @@ setappdata(handles.GUI, 'params', params);
 setappdata(handles.GUI, 'videoLoaded', 1);
 setappdata(handles.GUI, 'lastFrame', size(frames,3));
 setappdata(handles.GUI, 'currFrame', currFrame);
+setappdata(handles.GUI, 'alreadyCropped', 0);
 
 % adjust slider params
 set(handles.FrameSlider, 'Min', 1);

@@ -10,12 +10,19 @@ dateU(dateUI) = '_';
 frameStartMult = .45;
 cannyThresh = .35;
 
+% get applied pressure from file
+pressureFileName = [filePathRaw '\E' num2str(embryoNum) '_pressure.txt'];
+f = fopen(pressureFileName);
+pressureList = fscanf(f, '%f');
+fclose(f);
+pressureApplied = pressureList(end);
+
 if isequal(type, 'Human')
     procFileName = ['aspiration_data_', dateU, '_human_E'];
     frameMult = 1.2;
     cropVal = 1;
     pipSizeRef = 229;
-    Fin = .347 * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
+    Fin = pressureApplied * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
     % 229 pixels is standard pipette opening
     adaptHist = 0;
 elseif isequal(type, 'Mouse Oocyte')
@@ -23,14 +30,14 @@ elseif isequal(type, 'Mouse Oocyte')
     frameMult = .8;
     cropVal = .5;
     pipSizeRef = 126;
-    Fin = .167 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = pressureApplied * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
 elseif isequal(type, 'Mouse Embryo')
     procFileName = ['aspiration_data_', dateU, '_E'];
     frameMult = .8;
     cropVal = .5;
     pipSizeRef = 126;
-    Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = pressureApplied * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
     adaptHist = 1;
 end

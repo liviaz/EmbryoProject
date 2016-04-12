@@ -3,12 +3,12 @@
 %
 
 close all;
-pNum = '009';
-date = '12-2-15';
-embryoNum = '8';
+pNum = '021';
+date = '4-2-16';
+embryoNum = '5';
 
 manualPip = 1;
-manualCorner = 0;
+manualCorner = 1;
 manualMeasure = 0;
 filePath = 'C:\Users\Livia\Desktop\IVF\';
 
@@ -29,7 +29,7 @@ movpath = [filePathRaw '\MECH' pNum '-E' embryoNum '.avi'];
 convFactor = 2.27; % pixels / micron on clinical system
 cropVal = 1; % maximum num seconds to fit to model
 secsToGet = 1.2;
-startFrame = 28;
+startFrame = 25;
 cannyThresh = .08;
 pixelSag = 20;
 
@@ -45,7 +45,7 @@ if manualPip
 %     close all;
 %     pipRefOpeningPixels = round(abs(y(2) - y(1)));
 else
-    ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, filePathRaw, 1);
+    ROIframes = GetPipetteROI(newframes, cannyThresh, NaN, filePathRaw, 0);
     load([filePathRaw '\pipRef.mat']);
 end
 

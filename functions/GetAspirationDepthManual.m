@@ -14,7 +14,7 @@ frameNum = 1;
 firstRun = 1;
 manual_depth1 = [0];
 
-if nargin < 3
+if nargin < 3 || ~ishandle(extraFig)
     fig = figure;
 else
     fig = extraFig;

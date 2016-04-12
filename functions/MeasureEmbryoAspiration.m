@@ -2,12 +2,16 @@
 % Livia Zarnescu 8-31-15
 %
 
-function [paramFit] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
+function [paramFit, extraFig] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
     manualMeasure, filePathProc, procFileName, handles, extraFig, startFrame)
 
 framesToGet = round(params.frameRate*params.frameMult);
 if nargin < 10
     startFrame = round(params.frameStartMult*params.frameRate);
+end
+
+if ~ishandle(extraFig)
+    extraFig = figure;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,11 +104,16 @@ else
         mkdir([filePathProc], '\AutoMeasure');
     end
     
-    save([filePathProc '\AutoMeasure\' procFileName num2str(embryoNum) ...
+%     save([filePathProc '\AutoMeasure\' procFileName num2str(embryoNum) ...
+%         '.mat'], 'xfine', 'yfit', ...
+%         'k0', 'k1', 'n0', 'n1', 'tau', 'F0', 'fval', 't', ...
+%         'aspiration_depth', 'A');
+   
+    save([filePathProc '\' procFileName num2str(embryoNum) ...
         '.mat'], 'xfine', 'yfit', ...
         'k0', 'k1', 'n0', 'n1', 'tau', 'F0', 'fval', 't', ...
         'aspiration_depth', 'A');
-   
+
 end
 
 set(handles.MeasPipBtn, 'Enable', 'on');

@@ -559,6 +559,111 @@ box on;
 
 
 
+%% Fig 3E and F
+
+% reregenerate high-res IPA fig outputs
+
+downColor = [0 1 0];
+upColor = [1 0 0];
+
+panelE = {'BRCA1', 'RAE1', 'MBD4', 'FOXO3', 'BUB3', 'MRE11A', 'MCM7', ...
+    'BUB1', 'TTI1', 'FANCC', 'RAD18', 'NBN', 'SMC3', 'TERF1', 'HUS1', ...
+    'RBBP8', 'DBF4', 'NDC80', 'AURKB', 'NABP2', 'ATR', 'UIMC1', 'PARP2', ...
+    'ZW10', 'CDK2', 'XPC', 'CHEK2', 'TP53BP1', 'PIM1', 'BUB1B', 'DDB1', ...
+    'ZWILCH', 'FANCD2', 'CDKN1A', 'CDC6', 'HELB', 'E2F1', 'PTTG1', 'ZWINT', ...
+    'DCLRE1B', 'ZAK', 'SIN3B', 'HSPA1A', 'HSPA1B', 'CKS2', 'TP53', 'CCNG2', ...
+    'MXD1', 'MAPK14', 'PLK3', 'MAD2L1', 'CCNA2', 'NCAPD3', 'NCAPD2', ...
+    'CAPN2', 'SMC4', 'DLGAP5', 'NCAPG', 'HCFC1', 'KIF2C', 'KIF15', ...
+    'KIF18A', 'KIFC1'};
+logFCE = zeros(1,length(panelE));
+colorE = zeros(length(panelE),3);
+
+panelF = {'SURF4', 'PWWP2A', 'NEK6', 'DEC1', 'BEND3', 'MIER3', 'MIER2', 'HDAC1', ...
+    'ZBTB2', 'ZNF609', 'TRERF1', 'ARID5B', 'MT1E', 'SRD5A1', 'ZNF462', 'ZNF620', ...
+    'CBX5', 'ZNF45', 'MECP2', 'ENPP4', 'DLX6', 'MKI67', 'TSPAN14', 'REST', ...
+    'GON4L', 'YY1', 'ACTR8', 'INO80D', 'ZNF148', 'HDAC3', 'PARP14', 'PRDM4', ...
+    'WDTC1', 'MXD1' 'RNF17'};
+logFCF = zeros(1, length(panelF));
+colorF = zeros(length(panelF), 3);
+
+fileE = 'C:\Users\Livia\Dropbox\Embryo Mechanics outline shared\Data\IPA\logFC.txt';
+f = fopen(fileE, 'r');
+c = textscan(f, '%s %f');
+fclose(f);
+
+for i = 1:length(c{1})
+    nameCurr = c{1}(i);
+    for j = 1:length(panelE)
+        if isequal(nameCurr{1}(2:end-1), panelE{j})
+            logFCE(j) = c{2}(i);
+        end
+    end
+end
+
+
+for i = 1:length(logFCE)
+    if logFCE(i) > 0
+        colorE(i,:) = [1 1 1] - [1 0 1]*logFCE(i);
+    else
+        colorE(i,:) = [1 1 1] + [0 1 1]*logFCE(i);
+    end
+    colorE(colorE < 0) = 0;
+end
+
+
+for i = 1:length(c{1})
+    nameCurr = c{1}(i);
+    for j = 1:length(panelF)
+        if isequal(nameCurr{1}(2:end-1), panelF{j})
+            logFCF(j) = c{2}(i);
+        end
+    end
+end
+
+
+for i = 1:length(logFCF)
+    if logFCF(i) > 0
+        colorF(i,:) = [1 1 1] - [1 0 1]*logFCF(i);
+    else
+        colorF(i,:) = [1 1 1] + [0 1 1]*logFCF(i);
+    end
+    colorF(colorF < 0) = 0;
+end
+
+
+%% now plot
+figure(1);
+clf;
+
+for i = 1:length(logFCE)
+   rectangle('position', [80*mod(i,8) 4*floor(i/8)  8*length(panelE{i}) 2], ...
+       'edgecolor', 'k', 'linewidth', 1, 'facecolor', colorE(i,:), ...
+       'curvature', 1);
+   hold on;
+   text(80*mod(i,8)+1.5*length(panelE{i}), 4*floor(i/8)+1, panelE{i}, 'fontsize', 8);
+end
+    
+axis([-50 650 -5 35])
+
+
+figure(2);
+clf;
+
+for i = 1:length(logFCF)
+   rectangle('position', [80*mod(i,8) 4*floor(i/8)  8*length(panelF{i}) 2], ...
+       'edgecolor', 'k', 'linewidth', 1, 'facecolor', colorF(i,:), ...
+       'curvature', 1);
+   hold on;
+   text(80*mod(i,8)+1.5*length(panelF{i}), 4*floor(i/8)+1, panelF{i}, 'fontsize', 8);
+end
+    
+axis([-50 650 -5 35])
+
+
+
+
+
+
 
 
 
