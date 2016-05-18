@@ -9,7 +9,7 @@ function outputStruct = loadDataClinicalStudy()
 
 
 outputStruct = struct;
-numParticipants = 21;
+numParticipants = 22;
 participantIDs = cell(1,numParticipants);
 numEmbryos = zeros(1,numParticipants);
 outcomeInfo = cell(1,numParticipants); % 
@@ -183,9 +183,11 @@ gender{12} = [];
 % 12-13-15
 % Patient had E2 transferred, no pregnancy
 % then had E20 transferred
+% then had E3 and E16 transferred, resulted in 1 pregnancy so can't tell
+% which is which as they are both female
 participantIDs{13} = 'MECH013';
 numEmbryos(13) = 21;
-outcomeInfo{13} = [1 10 1 0 0 0 0 0 1 0 1 1 1 0 0 1 0 0 0 11 0];
+outcomeInfo{13} = [1 10 2 0 0 0 0 0 1 0 1 1 1 0 0 2 0 0 0 11 0];
 zygoteM{13} = [3 3 3 3 3 3 3 3 3 3 3 2 3 3 3 3 3 3 3 3 3 2];
 d3M{13} = {'10I', '8III', '8II', '6IV', '7V', '6III', '8IV', '8IV', ...
     '7IV', '8IV', '7IV', '6V', '8III', '4V', '7III', '9II', '5III', ...
@@ -244,8 +246,8 @@ zygoteM{17} = NaN*ones(1,7);
 d3M{17} = {'', '', '', '', '', '', ''};
 blastM{17} = {'5BB', '', '5BB', '', '6AB', '6BB', ''};
 ICSI{17} = zeros(1,10);
-PGD{17} = [0 NaN 1 NaN 1 0 NaN NaN NaN NaN];
-gender{17} = [0 NaN 1 NaN 0 1 NaN NaN NaN NaN];
+PGD{17} = [0 NaN 1 NaN 1 0 NaN];
+gender{17} = [0 NaN 1 NaN 0 1 NaN];
 
 % EMECH-018
 % 3-16-16 
@@ -266,11 +268,11 @@ participantIDs{19} = 'MECH019';
 numEmbryos(19) = 6;
 outcomeInfo{19} = [1 0 0 1 0 0];
 zygoteM{19} = NaN*ones(1,6);
-d3M{19} = {'', '', '', '', '', ''};
+d3M{19} = {'7I', '3I', '3II', '8II', '8II', '4III'};
 blastM{19} = {'5AB', '', '', '5BB', '', ''};
 ICSI{19} = ones(1,6);
-PGD{19} = NaN*zeros(1,6);
-gender{19} = NaN*zeros(1,6);
+PGD{19} = [0 NaN NaN 1 NaN NaN];
+gender{19} = [0 NaN NaN 1 NaN NaN];
 
 % EMECH-020
 % 3-29-16
@@ -286,16 +288,28 @@ PGD{20} = [];
 gender{20} = [];
 
 % EMECH-021
-% 3-26-16
+% 4-2-16
 participantIDs{21} = 'MECH021';
 numEmbryos(21) = 6;
-outcomeInfo{21} = 2*ones(1,6); %[0 1 0 1 1 0];
+outcomeInfo{21} = [0 1 0 1 12 0]; 
 zygoteM{21} = NaN*ones(1,6);
 d3M{21} = {'3II', '8II', '3V', '6III', '5III', '5III'};
-blastM{21} = {'', '2', '', '5AA', '5BB', ''};
+blastM{21} = {'', '2', '', '6AA', '5BB', ''};
 ICSI{21} = ones(1,6);
-PGD{21} = NaN*zeros(1,6);
-gender{21} = NaN*zeros(1,6);
+PGD{21} = [NaN 1 NaN 0 1 NaN];
+gender{21} = [NaN 0 NaN 0 1 NaN];
+
+% EMECH-022
+% 4-4-16
+participantIDs{22} = 'MECH022';
+numEmbryos(22) = 9;
+outcomeInfo{22} = [1 1 0 0 1 0 1 0 0];
+zygoteM{22} = NaN*ones(1,9);
+d3M{22} = {'', '', '', '', '', '', '', '', ''};
+blastM{22} = {'4BA', '4BB', '', '', '5AB', '', '5BB', '', ''};
+ICSI{22} = zeros(1,9);
+PGD{22} = [0 0 NaN NaN 1 NaN 0 NaN NaN];
+gender{22} = [0 0 NaN NaN 0 NaN 1 NaN NaN];
 
 
 outputStruct.numParticipants = numParticipants;

@@ -152,6 +152,12 @@ dateU(dateUI) = '_';
 setappdata(handles.GUI, 'currDate', currDate);
 setappdata(handles.GUI, 'dateU', dateU);
 
+setappdata(handles.GUI, 'filePathRaw', '');
+set(handles.RawDataLabel, 'String', '');
+setappdata(handles.GUI, 'filePathProc', '');
+set(handles.ProcDataLabel, 'String', '');
+
+
 
 % --- Executes during object creation, after setting all properties.
 function DateTextEdit_CreateFcn(hObject, eventdata, handles)
@@ -280,6 +286,11 @@ extraFig = getappdata(handles.GUI, 'extraFig');
 startFrame = getappdata(handles.GUI, 'currFrame');
 alreadyCropped = getappdata(handles.GUI, 'alreadyCropped');
 
+axes(handles.MeasAxes);
+if ~ishandle(extraFig)
+    extraFig = figure;
+end
+
 % 1. Get ROI around just pipette opening
 [ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw, alreadyCropped);
 
@@ -288,6 +299,8 @@ if exist([filePathRaw '\pipRef.mat'], 'file')
     setappdata(handles.GUI, 'pipRefExists', 1);
 end
 
+axes(handles.PlotAxes);
+cla;
 sROI = size(ROIframes);
 params.sROI = sROI;
 setappdata(handles.GUI, 'params', params);
@@ -295,6 +308,10 @@ setappdata(handles.GUI, 'frames', ROIframes);
 setappdata(handles.GUI, 'extraFig', extraFig);
 setappdata(handles.GUI, 'alreadyCropped', 1);
 clear frames;
+
+if ~ishandle(extraFig)
+    extraFig = figure;
+end
 
 % 2. Measure params from aspiration depth
 [paramsFit, extraFig] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
@@ -304,6 +321,7 @@ setappdata(handles.GUI, 'paramsFit', paramsFit);
 setappdata(handles.GUI, 'extraFig', extraFig);
 
 % 3. Display in GUI
+axes(handles.PlotAxes);
 set(handles.k1_box, 'String', sprintf('%0.3f',paramsFit.k1));
 set(handles.n1_box, 'String', sprintf('%0.3f',paramsFit.n1));
 set(handles.tau_box, 'String', sprintf('%0.3f',paramsFit.tau));

@@ -2,12 +2,12 @@
 % LZ 10-2-15
 
 % E8,E9.E10 10-8-15 is great example of stress/strain characteristic curve 
-date = '10-21-15';
+date = '10-8-15';
 fileDir = ['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\Mouse Oocyte\videos ' date];
 procDir = ['C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\' date ' analysis'];
-type = 'Membrane'; 
-eNum = 2;
-embryoNum = 'E2';
+type = 'Zona'; 
+eNum = 10;
+embryoNum = 'E10';
 convToMicrons = 40/128;
 % colorList = [0 0 .6; 0 .6 0; .6 0 0; 0 .6 .6; .6 0 .6];
 

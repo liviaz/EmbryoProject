@@ -34,13 +34,14 @@ dayThreeM2 = [];
 blastStage = [];
 blastScore = [];
 
-ptsToPlot = [ones(1,13) 1 1 1 1 1 1 1 1]; %[1 0 0 0 0 0 0 0 0 0 0 0 0];
+ptsToPlot = [ones(1,21) 1]; %[1 0 0 0 0 0 0 0 0 0 0 0 0];
 aText = [];
 cText = {};
 
 % load in params by participant and embryo num
 for i = 1:numParticipants
     if ptsToPlot(i)
+        i
         for j = 1:numEmbryos(i)
 
             currE = currE + 1;
@@ -49,7 +50,7 @@ for i = 1:numParticipants
             ptList = [ptList i];
 
             % save embryo params and color
-            if exist(currDataPath, 'file') && (ICSI{i}(j) == 1)
+            if exist(currDataPath, 'file') && (ICSI{i}(j)== 0)
                 load(currDataPath);
                 mList = [mList outcomeInfo{i}(j)>0];
                 k0list = [k0list k0];
@@ -95,22 +96,22 @@ for i = 1:numParticipants
                 if (blastStage(end) > 4) && (blastScore(end) < 1.6)
                     colorMat = [colorMat; [.2 .6 .9]];
                 elseif (blastStage(end) > 0)
-                    colorMat = [colorMat; [.9 .2 .8]];%
+                    colorMat = [colorMat; [.85 .65 .2]];%[.9 .2 .8]];%
                 else
                     colorMat = [colorMat; [.85 .65 .2]];
                 end
                 
-                if outcomeInfo{i}(j) == 2 % unknown
-                    mList(end) = 2;
+%                 if outcomeInfo{i}(j) == 2 % unknown
+%                     mList(end) = 2;
+%                     colorMat(end,:) = [1 0 0];
+%                 end
+                
+                % implantation/pregnancy color coding
+                if outcomeInfo{i}(j) == 10 % no hCG rise
+                    mList(end) = 10;
                     colorMat(end,:) = [1 0 0];
                 end
                 
-%                 % implantation/pregnancy color coding
-%                 if outcomeInfo{i}(j) == 10 % no hCG rise
-%                     mList(end) = 10;
-%                     colorMat(end,:) = [1 0 0];
-%                 end
-%                 
                 if outcomeInfo{i}(j) == 11 % hCG rise, no pregnancy
                     mList(end) = 11;
                     colorMat(end,:) = [.7 .7 0];
@@ -121,13 +122,21 @@ for i = 1:numParticipants
                     colorMat(end,:) = [0 .5 0];
                 end
 
-
-%                 if ICSI{i}(j) == 1
-%                     colorMat(end,:) = [0 .5 0];
-%                 elseif ICSI{i}(j) == 0
-%                     colorMat(end,:) = [1 0 0];
-%                 end
+                    % ICSI / IVF color coding
+%                     if ICSI{i}(j) == 1
+%                         colorMat(end,:) = [.2 .6 .9];
+%                     elseif ICSI{i}(j) == 0
+%                         colorMat(end,:) = [.85 .65 .2];
+%                     end
                     
+                    % PGD color coding
+%                   if PGD{i}(j) == 1
+%                       colorMat(end,:) = [.2 .6 .9]; % euploid
+%                   elseif PGD{i}(j) == 0
+%                       colorMat(end,:) = [.85 .65 .2]; % aneuploid
+%                   else 
+%                       k1list(end) = NaN;
+%                   end
 
 
                 
@@ -194,9 +203,8 @@ b = num2str(aText');
 c = cellstr(b);
 dx = -0.01; dy = 0.015; dz = .5; % displacement so the text does not overlay the data points
 hold on;
-text(p1(end-5:end)+dx, p2(end-5:end)+dy, cText(end-5:end)'); %, p3+dz, c);
-% view(.5,90)
-% view(.5,0)
+% text(p1+dx, p2+dy, cText'); %, p3+dz, c);
+view(.5,90)
 
 
 %% 1. Plot ICSI vs IVF mech properties
@@ -328,7 +336,7 @@ hold on;
 contour(c(1).XData, c(1).YData, c(1).ZData, -.3*[1 1], 'k', 'linewidth', 2);
 set(h, 'Marker', 'o');
 set(gca, 'FontSize', 14);
-title('IVF');
+title('ICSI');
 xlabel('k1 parameter');
 ylabel('n1 parameter');
 grid on;

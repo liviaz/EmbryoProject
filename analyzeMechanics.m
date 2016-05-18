@@ -32,7 +32,14 @@ for i = 1:length(eNums)
             '_E', num2str(eNums(i)), '_pt', num2str(pressureVals(j)), '.mat'];
         
         load(currFile);
-        
+        %%%%%%%%%%%%%%%%%%%
+                
+        pressureApplied = pressureVals(j)*0.1*0.85;
+        Fin = pressureApplied * 6895 * pi * (20*128/126*10^-6)^2;
+        [xfine yfit k0 k1 n0 n1 F0 tau fval] = KelvinFit3(t, A, Fin, 1, [k0 k1 tau n1]');
+        pause;
+        %%%%%%%%%%%%%%%%%%%%
+
         k1M(i,j) = k1;
         n1M(i,j) = n1;
         k0M(i,j) = k0;
@@ -390,6 +397,10 @@ grid on;
 
 %% 3. compare different culture conditions (KSOM vs culture media)
 % as well as time inside/outside incubator and mechanical measurement
+% mech group was measured at
+% exp group was measured only once at 24 hrs, but brought outside incubator
+%   while mech group was being measured
+% inc group was kept inside incubator and only measured once at 24 hrs
 
 baseDir = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte';
 groups = {'mechK', 'mechM', 'expK', 'expM', 'incK', 'incM'};
@@ -465,17 +476,14 @@ set(gca, 'fontsize', 14);
 h1 = bar(1, mean(k1Mech), .8, 'facecolor', colorVec(1,:));
 hold on;
 e1 = errorbar(1, mean(k1Mech), std(k1Mech),'color', 'k', 'linewidth', 2);
-setErrorBar(e1, 1, .03);
 
 h2 = bar(2, mean(k1Exp), .8, 'facecolor', colorVec(3,:));
 hold on;
 e2 = errorbar(2, mean(k1Exp), std(k1Exp),'color', 'k', 'linewidth', 2);
-setErrorBar(e2, 2, .03);
 
 h3 = bar(3, mean(k1Inc), .8, 'facecolor', colorVec(5,:));
 hold on;
 e3 = errorbar(3, mean(k1Inc), std(k1Inc),'color', 'k', 'linewidth', 2);
-setErrorBar(e3, 3, .03);
 
 set(gca, 'xtick', [1 2 3])
 legend([h1 h2 h3], {'mech + outside incubator', 'outside incubator', ...
@@ -494,12 +502,10 @@ set(gca, 'fontsize', 14);
 h1 = bar(1, mean(k1K), .8, 'facecolor', colorVec(1,:));
 hold on;
 e1 = errorbar(1, mean(k1K), std(k1K),'color', 'k', 'linewidth', 2);
-setErrorBar(e1, 1, .03);
 
 h2 = bar(2, mean(k1M), .8, 'facecolor', colorVec(2,:));
 hold on;
 e2 = errorbar(2, mean(k1M), std(k1M),'color', 'k', 'linewidth', 2);
-setErrorBar(e2, 2, .03);
 
 set(gca, 'xtick', [1 2])
 legend([h1 h2], {'KSOM', 'MM'}, 'location', 'northwest');
@@ -524,32 +530,26 @@ set(gca, 'fontsize', 14);
 h1 = bar(.8, mean(k11), .4, 'facecolor', colorVec(1,:));
 hold on;
 e1 = errorbar(.8, mean(k11), std(k11), 'color', 'k', 'linewidth', 2);
-setErrorBar(e1, .8, .03);
 
 h2 = bar(1.2, mean(k12), .4, 'facecolor', colorVec(2,:));
 hold on;
 e2 = errorbar(1.2, mean(k12), std(k12), 'color', 'k', 'linewidth', 2);
-setErrorBar(e2, 1.2, .03);
 
 h3 = bar(1.8, mean(k13), .4, 'facecolor', colorVec(3,:));
 hold on;
 e3 = errorbar(1.8, mean(k13), std(k13), 'color', 'k', 'linewidth', 2);
-setErrorBar(e3, 1.8, .03);
 
 h4 = bar(2.2, mean(k14), .4, 'facecolor', colorVec(4,:));
 hold on;
 e3 = errorbar(2.2, mean(k14), std(k14), 'color', 'k', 'linewidth', 2);
-setErrorBar(e3, 2.2, .03);
 
 h5 = bar(2.8, mean(k15), .4, 'facecolor', colorVec(5,:));
 hold on;
 e5 = errorbar(2.8, mean(k15), std(k15), 'color', 'k', 'linewidth', 2);
-setErrorBar(e5, 2.8, .03);
 
 h6 = bar(3.2, mean(k16), .4, 'facecolor', colorVec(6,:));
 hold on;
 e6 = errorbar(3.2, mean(k16), std(k16), 'color', 'k', 'linewidth', 2);
-setErrorBar(e6, 3.2, .03);
 
 set(gca, 'xtick', [1 2 3])
 legend([h1 h2 h3 h4 h5 h6], {'mech + KSOM', 'mech + MM', ...
@@ -574,7 +574,7 @@ colorVec = [0 0 .5; .6 .6 .8];
 baseDir = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte';
 groups = {'mechK', 'mechM', 'expK', 'expM', 'incK', 'incM'};
 dates = {'10-8-15', '10-21-15'};
-hourList = {'', '_7', '_17', '_24', '', '_8', '_16', '_24'};
+hourList = {'', '_8', '_16', '_24', '', '_8', '_16', '_24'};
 groupAll = [];
 dateAll = [];
 embryoNumAll = [];
@@ -656,37 +656,30 @@ set(gca, 'fontsize', 14);
 h1 = bar(.8, mean(k1t1g1), .4, 'facecolor', colorVec(1,:));
 hold on;
 e1 = errorbar(.8, mean(k1t1g1), std(k1t1g1), 'color', 'k', 'linewidth', 2);
-setErrorBar(e1, .8, .03);
 
 h2 = bar(1.2, mean(k1t1g2), .4, 'facecolor', colorVec(2,:));
 hold on;
 e2 = errorbar(1.2, mean(k1t1g2), std(k1t1g2), 'color', 'k', 'linewidth', 2);
-setErrorBar(e2, 1.2, .03);
 
 h3 = bar(1.8, mean(k1t2g1), .4, 'facecolor', colorVec(1,:));
 hold on;
 e3 = errorbar(1.8, mean(k1t2g1), std(k1t2g1), 'color', 'k', 'linewidth', 2);
-setErrorBar(e3, 1.8, .03);
 
 h4 = bar(2.2, mean(k1t2g2), .4, 'facecolor', colorVec(2,:));
 hold on;
 e3 = errorbar(2.2, mean(k1t2g2), std(k1t2g2), 'color', 'k', 'linewidth', 2);
-setErrorBar(e3, 2.2, .03);
 
 h5 = bar(2.8, mean(k1t3g1), .4, 'facecolor', colorVec(1,:));
 hold on;
 e5 = errorbar(2.8, mean(k1t3g1), std(k1t3g1), 'color', 'k', 'linewidth', 2);
-setErrorBar(e5, 2.8, .03);
 
 h6 = bar(3.2, mean(k1t3g2), .4, 'facecolor', colorVec(2,:));
 hold on;
 e6 = errorbar(3.2, mean(k1t3g2), std(k1t3g2), 'color', 'k', 'linewidth', 2);
-setErrorBar(e6, 3.2, .03);
 
 h7 = bar(3.8, mean(k1t4g1), .4, 'facecolor', colorVec(1,:));
 hold on;
 e7 = errorbar(3.8, mean(k1t4g1), std(k1t4g1), 'color', 'k', 'linewidth', 2);
-setErrorBar(e7, 3.8, .03);
 
 h8 = bar(4.2, mean(k1t4g2), .4, 'facecolor', colorVec(2,:));
 hold on;
@@ -953,7 +946,46 @@ set(amc, 'FaceAlpha', .3);
 
 legend([hk hm], {'KSOM', 'MM'}, 'box', 'off');
 box on;
-xlim([.05 .15]);
+
+
+%% 6. For a single embryo, plot pressure vs equilibrium depth
+
+
+load('C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\10-8-15 analysis\Zona\allZona.mat');
+embryoToPlot = 10;
+
+figure(6);
+clf;
+scatter((depthAll{embryoToPlot} - min(depthAll{embryoToPlot}))/20, ...
+    (pressureAll{embryoToPlot} - min(pressureAll{embryoToPlot})), 100, ...
+    'marker', '+', 'linewidth', 3, 'markerfacecolor', [0 0 .8]);
+grid on;
+
+hold on;
+plot(ones(1,20), linspace(0,.5,20), '--k', 'linewidth', 3);
+xlim([0 1.7]);
+set(gca, 'fontsize', 14);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

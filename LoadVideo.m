@@ -64,37 +64,43 @@ if ~exist(timepath, 'file')
     return;   
 end
 
-% read in video and time stamp
-obj = VideoReader(movpath);
-fid = fopen(timepath);
-tcell = textscan(fid, '%f');
-fclose(fid);
-tlist = tcell{1,1};
-tlist = tlist(3:end)';
-frameRate = obj.FrameRate;
 
-% read in frames starting just before aspiration
-currFirstFrame = 1;
-currLastFrame = min(obj.NumberOfFrames - 2, round(frameRate*(frameStartMult+2)));
+secsToGet = -1;
+startFrame = 1;
+[newframes, frameRate] = ReadInVideo(movpath, secsToGet, startFrame, 0, 0);
+t = 0:1/frameRate:((size(newframes,3)-1)/frameRate);
 
-
-% read in some of the frames, define time vector
-frames = read(obj, [currFirstFrame currLastFrame]);
-tlist = tlist(currFirstFrame:currLastFrame);
-t = 0:1/frameRate:(currLastFrame-currFirstFrame)/frameRate;
-
-% convert frames to grayscale and double format
-s = size(frames);
-numFrames = s(4);
-newframes = zeros(size(frames,1), size(frames,2), numFrames);
-for i = 1:numFrames
-    if s(3) > 1
-        % take each frame and make it grayscale
-        newframes(:,:,i) = double(rgb2gray(frames(:,:,:,i)))/255;
-    else
-        newframes(:,:,i) = double(frames(:,:,i))/255;
-    end
-end
+% % read in video and time stamp
+% obj = VideoReader(movpath);
+% fid = fopen(timepath);
+% tcell = textscan(fid, '%f');
+% fclose(fid);
+% tlist = tcell{1,1};
+% tlist = tlist(3:end)';
+% frameRate = obj.FrameRate;
+% 
+% % read in frames starting just before aspiration
+% currFirstFrame = 1;
+% currLastFrame = min(obj.NumberOfFrames - 2, round(frameRate*(frameStartMult+2)));
+% 
+% 
+% % read in some of the frames, define time vector
+% frames = read(obj, [currFirstFrame currLastFrame]);
+% tlist = tlist(currFirstFrame:currLastFrame);
+% t = 0:1/frameRate:(currLastFrame-currFirstFrame)/frameRate;
+% 
+% % convert frames to grayscale and double format
+% s = size(frames);
+% numFrames = s(4);
+% newframes = zeros(size(frames,1), size(frames,2), numFrames);
+% for i = 1:numFrames
+%     if s(3) > 1
+%         % take each frame and make it grayscale
+%         newframes(:,:,i) = double(rgb2gray(frames(:,:,:,i)))/255;
+%     else
+%         newframes(:,:,i) = double(frames(:,:,i))/255;
+%     end
+% end
 
 imshow(newframes(:,:,round(frameStartMult*frameRate)), 'Parent', handles.MeasAxes);
 

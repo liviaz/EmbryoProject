@@ -5,9 +5,9 @@
 close all;
 pNum = '022';
 date = '4-4-16';
-embryoNum = '5';
+embryoNum = '4';
 
-manualPip = 1;
+manualPip = 0;
 manualCorner = 0;
 manualMeasure = 0;
 filePath = 'C:\Users\Livia\Desktop\IVF\';

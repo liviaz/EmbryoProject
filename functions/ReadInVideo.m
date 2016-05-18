@@ -1,13 +1,29 @@
 % read in a video file and convert it to grayscale
 
-function [framesOut, frameRate] = ReadInVideo(movpath, vidSecs, startFrame, flip)
+function [framesOut, frameRate] = ReadInVideo(movpath, vidSecs, startFrame, flipside, flipvert)
+
+if nargin < 4
+    flipside = 0;
+    flipvert = 0;
+end
+
+if nargin < 5
+    flipvert = 0;
+end
 
 % read in video
 obj = VideoReader(movpath);
 frameRate = obj.FrameRate;
-totalFrames = round(frameRate*vidSecs);
+
+% get all or some
+if vidSecs == -1
+    totalFrames = floor(frameRate*obj.Duration);
+else
+    totalFrames = round(frameRate*vidSecs);
+end
+
 obj.CurrentTime = startFrame / obj.FrameRate;
-lastFrame = min(obj.FrameRate*obj.Duration - 1, startFrame + totalFrames);
+lastFrame = round(min(obj.FrameRate*obj.Duration - 1, startFrame + totalFrames));
 numFrames = lastFrame - startFrame + 1;
 
 
@@ -21,14 +37,22 @@ for i = startFrame:lastFrame
     
     if length(s) > 2
         % take each frame and make it grayscale
-        if flip
+        if flipside && flipvert
             framesOut(:,:,i-startFrame+1) = rot90(double(rgb2gray(currFrame)),2)/255;
+        elseif flipvert
+            framesOut(:,:,i-startFrame+1) = flipud(double(rgb2gray(currFrame)))/255;
+        elseif flipside
+            framesOut(:,:,i-startFrame+1) = fliplr(double(rgb2gray(currFrame)))/255;
         else
             framesOut(:,:,i-startFrame+1) = double(rgb2gray(currFrame))/255;
         end
     else
-        if flip
+        if flipside && flipvert
             framesOut(:,:,i-startFrame+1) = rot90(double(currFrame),2)/255;
+        elseif flipvert
+            framesOut(:,:,i-startFrame+1) = flipud(double(currFrame))/255;
+        elseif flipside
+            framesOut(:,:,i-startFrame+1) = fliplr(double(currFrame))/255;
         else
             framesOut(:,:,i-startFrame+1) = double(currFrame)/255;
         end
