@@ -22,7 +22,7 @@ function varargout = measGUI(varargin)
 
 % Edit the above text to modify the response to help measGUI
 
-% Last Modified by GUIDE v2.5 04-Sep-2015 16:28:43
+% Last Modified by GUIDE v2.5 02-Jun-2016 14:35:10
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,32 +65,67 @@ currYear = today(3:4);
 currMonth = num2str(str2num(today(dashes(1)+1:dashes(2)-1)));
 currDay = num2str(str2num(today(dashes(2)+1:end)));
 
-setappdata(handles.GUI, 'currDate', [currMonth '-' currDay '-' currYear]);
-setappdata(handles.GUI, 'dateU', [currMonth '_' currDay '_' currYear]);
-setappdata(handles.GUI, 'type', 'Mouse Embryo');
-setappdata(handles.GUI, 'pipRefExists', 0);
-setappdata(handles.GUI, 'embryoNum', '1');
-setappdata(handles.GUI, 'pipSize', 128);
-setappdata(handles.GUI, 'manualMeasure', 0);
-setappdata(handles.GUI, 'filePathRaw', '');
-setappdata(handles.GUI, 'filePathProc', '');
-setappdata(handles.GUI, 'videoLoaded', 0);
-setappdata(handles.GUI, 'frames', []);
-setappdata(handles.GUI, 'lastFrame', 0);
-setappdata(handles.GUI, 'currFrame', 0);
-setappdata(handles.GUI, 't', []);
-setappdata(handles.GUI, 'params', []);
-setappdata(handles.GUI, 'paramsFit', []);
-setappdata(handles.GUI, 'displayFig', figure(1));
-setappdata(handles.GUI, 'plotFig', figure(2));
-setappdata(handles.GUI, 'extraFig', figure(3));
-setappdata(handles.GUI, 'zpEnter', 0);
-setappdata(handles.GUI, 'cellEnter', 0);
-setappdata(handles.GUI, 'alreadyCropped', 0);
-
-close(1);
-close(2);
-close(3);
+% check if settings file exists and load it, otherwise start off all values
+% as default
+settingsFileName = 'C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\GUIsettings.mat';
+if exist(settingsFileName, 'file')
+    
+    % load previous state
+    load(settingsFileName);
+    setappdata(handles.GUI, 'currDate', currDate);
+    setappdata(handles.GUI, 'dateU', dateU);
+    setappdata(handles.GUI, 'measType', measType);
+    setappdata(handles.GUI, 'pipRefExists', pipRefExists);
+    setappdata(handles.GUI, 'embryoNum', embryoNum);
+    setappdata(handles.GUI, 'pipSize', pipSize);
+    setappdata(handles.GUI, 'manualMeasure', manualMeasure);
+    setappdata(handles.GUI, 'filePathRaw', filePathRaw);
+    setappdata(handles.GUI, 'filePathProc', filePathProc);
+    setappdata(handles.GUI, 'videoLoaded', videoLoaded);
+    setappdata(handles.GUI, 'frames', []);
+    setappdata(handles.GUI, 'lastFrame', lastFrame);
+    setappdata(handles.GUI, 'currFrame', currFrame);
+    setappdata(handles.GUI, 't', t);
+    setappdata(handles.GUI, 'params', params);
+    setappdata(handles.GUI, 'paramsFit', paramsFit);
+    setappdata(handles.GUI, 'displayFigNum', displayFigNum);
+    setappdata(handles.GUI, 'plotFigNum', plotFigNum);
+    setappdata(handles.GUI, 'extraFigNum', extraFigNum);
+    setappdata(handles.GUI, 'zpEnter', zpEnter);
+    setappdata(handles.GUI, 'cellEnter', cellEnter);
+    setappdata(handles.GUI, 'alreadyCropped', alreadyCropped);
+    
+    % init GUI to previous state
+    set(handles.DateTextEdit, 'String', getappdata(handles.GUI, 'currDate'));
+    set(handles.RawDataLabel, 'String', filePathRaw);
+    set(handles.ProcDataLabel, 'String', filePathProc);
+    set(handles.PipSizeEdit, 'String', num2str(pipSize));
+    
+    
+else
+    setappdata(handles.GUI, 'currDate', [currMonth '-' currDay '-' currYear]);
+    setappdata(handles.GUI, 'dateU', [currMonth '_' currDay '_' currYear]);
+    setappdata(handles.GUI, 'measType', 'Mouse Embryo');
+    setappdata(handles.GUI, 'pipRefExists', 0);
+    setappdata(handles.GUI, 'embryoNum', '1');
+    setappdata(handles.GUI, 'pipSize', 128);
+    setappdata(handles.GUI, 'manualMeasure', 0);
+    setappdata(handles.GUI, 'filePathRaw', '');
+    setappdata(handles.GUI, 'filePathProc', '');
+    setappdata(handles.GUI, 'videoLoaded', 0);
+    setappdata(handles.GUI, 'frames', []);
+    setappdata(handles.GUI, 'lastFrame', 0);
+    setappdata(handles.GUI, 'currFrame', 0);
+    setappdata(handles.GUI, 't', []);
+    setappdata(handles.GUI, 'params', []);
+    setappdata(handles.GUI, 'paramsFit', []);
+    setappdata(handles.GUI, 'displayFigNum', 1);
+    setappdata(handles.GUI, 'plotFigNum', 2);
+    setappdata(handles.GUI, 'extraFigNum', 3);
+    setappdata(handles.GUI, 'zpEnter', 0);
+    setappdata(handles.GUI, 'cellEnter', 0);
+    setappdata(handles.GUI, 'alreadyCropped', 0);
+end
 
 % UIWAIT makes measGUI wait for user response (see UIRESUME)
 % uiwait(handles.GUI);
@@ -107,6 +142,34 @@ function varargout = measGUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+
+% --- Executes when user attempts to close GUI.
+function GUI_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to GUI (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% write current data to a temp file to save for next time the function is
+% opened
+settingsFileName = 'C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\GUIsettings.mat';
+settingsToSave = getappdata(handles.GUI)';
+
+% clear structs and potentially large variables
+if isfield(settingsToSave, 'GUIDEOptions')
+    settingsToSave = rmfield(settingsToSave,'GUIDEOptions');
+end
+if isfield(settingsToSave, 'UsedByGUIData_m')
+    settingsToSave = rmfield(settingsToSave,'UsedByGUIData_m');
+end
+if isfield(settingsToSave, 'frames')
+    settingsToSave = rmfield(settingsToSave,'frames');
+end
+save(settingsFileName, '-struct', 'settingsToSave');
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);
+
+
 % --- Executes on selection change in TypeSelector.
 function TypeSelector_Callback(hObject, eventdata, handles)
 % hObject    handle to TypeSelector (see GCBO)
@@ -117,8 +180,8 @@ function TypeSelector_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from TypeSelector
 
 contents = cellstr(get(hObject,'String'));
-type = contents{get(hObject,'Value')};
-setappdata(handles.GUI, 'type', type);
+measType = contents{get(hObject,'Value')};
+setappdata(handles.GUI, 'measType', measType);
 
 
 
@@ -151,11 +214,31 @@ dateUI = strfind(currDate, '-');
 dateU(dateUI) = '_';
 setappdata(handles.GUI, 'currDate', currDate);
 setappdata(handles.GUI, 'dateU', dateU);
+measType = getappdata(handles.GUI, 'measType');
 
-setappdata(handles.GUI, 'filePathRaw', '');
-set(handles.RawDataLabel, 'String', '');
-setappdata(handles.GUI, 'filePathProc', '');
-set(handles.ProcDataLabel, 'String', '');
+filePathRaw = ['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\' measType ...
+    '\videos ' currDate];
+filePathProc = ['C:\Users\Livia\Desktop\IVF\Processed Data\' measType ...
+    '\' currDate ' analysis'];
+
+if ~exist(filePathRaw, 'dir')
+    setappdata(handles.GUI, 'filePathRaw', '');
+    set(handles.RawDataLabel, 'String', '');
+    setappdata(handles.GUI, 'filePathProc', '');
+    set(handles.ProcDataLabel, 'String', '');
+    errordlg('No raw or processed data found for this location!');
+elseif ~exist(filePathProc, 'dir')
+    setappdata(handles.GUI, 'filePathRaw', filePathRaw);
+    set(handles.RawDataLabel, 'String', filePathRaw);
+    mkdir(filePathProc);
+    setappdata(handles.GUI, 'filePathProc', filePathProc);
+    set(handles.ProcDataLabel, 'String', filePathProc);
+else
+    setappdata(handles.GUI, 'filePathRaw', filePathRaw);
+    set(handles.RawDataLabel, 'String', filePathRaw);
+    setappdata(handles.GUI, 'filePathProc', filePathProc);
+    set(handles.ProcDataLabel, 'String', filePathProc);
+end
 
 
 
@@ -167,6 +250,7 @@ function DateTextEdit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
+
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -205,21 +289,13 @@ function MeasPipBtn_Callback(hObject, eventdata, handles)
 % display a frame in the video, tell user to click top and bottom of
 % pipette
 
-displayFig = getappdata(handles.GUI, 'displayFig');
+displayFigNum = getappdata(handles.GUI, 'displayFigNum');
+fig = figure(displayFigNum);
+clf;
+frames = getappdata(handles.GUI, 'frames');
+imshow(frames(:,:,1));
 
-if ~ishandle(displayFig)
-    
-    fig = figure(1);
-    setappdata(handles.GUI, 'displayFig', fig);
-    clf;
-    frames = getappdata(handles.GUI, 'frames');
-    imshow(frames(:,:,1));
-    
-else
-    figure(displayFig);
-end
-
-[x y] = ginput(2)
+[x, y] = ginput(2);
 pipSize = round(abs(y(2) - y(1)));
 setappdata(handles.GUI, 'pipSize', pipSize);
 set(handles.PipSizeEdit, 'String', num2str(pipSize));
@@ -282,17 +358,15 @@ cannyThresh = params.cannyThresh;
 filePathRaw = getappdata(handles.GUI, 'filePathRaw');
 filePathProc = getappdata(handles.GUI, 'filePathProc');
 procFileName = params.procFileName;
-extraFig = getappdata(handles.GUI, 'extraFig');
+extraFigNum = getappdata(handles.GUI, 'extraFigNum');
 startFrame = getappdata(handles.GUI, 'currFrame');
 alreadyCropped = getappdata(handles.GUI, 'alreadyCropped');
 
 axes(handles.MeasAxes);
-if ~ishandle(extraFig)
-    extraFig = figure;
-end
+fig = figure(extraFigNum);
 
 % 1. Get ROI around just pipette opening
-[ROIframes] = GetPipetteROI(frames, cannyThresh, extraFig, filePathRaw, alreadyCropped);
+[ROIframes] = GetPipetteROI(frames, cannyThresh, fig, filePathRaw, alreadyCropped);
 
 if exist([filePathRaw '\pipRef.mat'], 'file')
     set(handles.PipRefIndicator, 'String', 'YES');
@@ -305,20 +379,17 @@ sROI = size(ROIframes);
 params.sROI = sROI;
 setappdata(handles.GUI, 'params', params);
 setappdata(handles.GUI, 'frames', ROIframes);
-setappdata(handles.GUI, 'extraFig', extraFig);
+setappdata(handles.GUI, 'extraFigNum', extraFigNum);
 setappdata(handles.GUI, 'alreadyCropped', 1);
 clear frames;
 
-if ~ishandle(extraFig)
-    extraFig = figure;
-end
+figure(extraFigNum); clf;
 
 % 2. Measure params from aspiration depth
-[paramsFit, extraFig] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
-    manualMeasure, filePathProc, procFileName, handles, extraFig, startFrame);
+[paramsFit, fig] = MeasureEmbryoAspiration(ROIframes, t, params, embryoNum, ...
+    manualMeasure, filePathProc, procFileName, handles, fig, startFrame);
 
 setappdata(handles.GUI, 'paramsFit', paramsFit);
-setappdata(handles.GUI, 'extraFig', extraFig);
 
 % 3. Display in GUI
 axes(handles.PlotAxes);
@@ -336,7 +407,7 @@ function LoadVideoBtn_Callback(hObject, eventdata, handles)
 
 currDate = getappdata(handles.GUI, 'currDate')
 dateU = getappdata(handles.GUI, 'dateU')
-type = getappdata(handles.GUI, 'type')
+measType = getappdata(handles.GUI, 'measType')
 embryoNum = getappdata(handles.GUI, 'embryoNum')
 pipSize = getappdata(handles.GUI, 'pipSize')
 manualMeasure = getappdata(handles.GUI, 'manualMeasure')
@@ -348,7 +419,7 @@ if isequal(filePathRaw, '') || isequal(filePathProc, '')
     return;
 end
 
-[frames, t, params] = LoadVideo(type, currDate, pipSize, filePathRaw, ...
+[frames, t, params] = LoadVideo(measType, currDate, pipSize, filePathRaw, ...
     embryoNum, handles);
 
 currFrame = round(params.frameStartMult*params.frameRate);
@@ -370,8 +441,8 @@ setappdata(handles.GUI, 'zpEnter', 0);
 setappdata(handles.GUI, 'cellEnter', 0);
 axes(handles.PlotAxes);
 cla;
-set(handles.ZPframeLabel, 'String', 'Frame: ');
-set(handles.CellFrameLabel, 'String', 'Frame: ');
+set(handles.ZPframeLabel, 'String', 'Frame: 0');
+set(handles.CellFrameLabel, 'String', 'Frame: 0');
 
 set(handles.MeasPipBtn, 'Enable', 'on');
 set(handles.EmbryoMeasBtn, 'Enable', 'on');
@@ -389,8 +460,8 @@ function RawDataBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 contents = cellstr(get(handles.TypeSelector, 'String'));
-type = contents{get(handles.TypeSelector,'Value')};
-filePathRaw = uigetdir(['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\' type], ...
+measType = contents{get(handles.TypeSelector,'Value')};
+filePathRaw = uigetdir(['C:\Users\Livia\Desktop\IVF\Raw Data\Videos\' measType], ...
     'Select Raw Data Folder');
 setappdata(handles.GUI, 'filePathRaw', filePathRaw);
 set(handles.RawDataLabel, 'String', filePathRaw);
@@ -413,8 +484,8 @@ function ProcDataBtn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 contents = cellstr(get(handles.TypeSelector, 'String'));
-type = contents{get(handles.TypeSelector,'Value')};
-filePathProc = uigetdir(['C:\Users\Livia\Desktop\IVF\Processed Data\' type], ...
+measType = contents{get(handles.TypeSelector,'Value')};
+filePathProc = uigetdir(['C:\Users\Livia\Desktop\IVF\Processed Data\' measType], ...
     'Select Processed Data Folder');
 setappdata(handles.GUI, 'filePathProc', filePathProc);
 set(handles.ProcDataLabel, 'String', filePathProc);
@@ -435,18 +506,10 @@ function NewDisplayBtn_Callback(hObject, eventdata, handles)
 
 
 frames = getappdata(handles.GUI, 'frames');
-displayFig = getappdata(handles.GUI, 'displayFig');
+displayFigNum = getappdata(handles.GUI, 'displayFigNum');
 
 if ~isempty(frames)
-    
-    if isnan(displayFig)
-        fig = figure(1);
-        setappdata(handles.GUI, 'displayFig', fig);
-    else
-        figure(displayFig);
-    end
-    
-    clf;
+    fig = figure(displayFigNum); clf;
     imshow(frames(:,:,1));
 else
     errordlg('Error: no frames loaded');
@@ -552,18 +615,10 @@ function NewDisplayBtnPlot_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 paramsFit = getappdata(handles.GUI, 'paramsFit');
-plotFig = getappdata(handles.GUI, 'plotFig');
+plotFigNum = getappdata(handles.GUI, 'plotFigNum');
 
 if ~isempty(paramsFit)
-    
-    if isnan(displayFig)
-        fig = figure(2);
-        setappdata(handles.GUI, 'plotFig', fig);
-    else
-        figure(plotFig);
-    end
-    
-    clf;
+    fig = figure(plotFigNum); clf;
     KelvinFit3(t, A, Fin, 1, [paramsFit.k0 paramsFit.k1 ...
         paramsFit.tau paramsFit.n1]);
 else
@@ -588,6 +643,7 @@ if ~isempty(frames) && lastFrame > 0 && currFrame > 0
         setappdata(handles.GUI, 'currFrame', currFrame + 1);
         set(handles.currFrameLabel, 'String', ['frame: ' ...
             num2str(currFrame + 1)]);
+        set(handles.FrameSlider, 'Value', currFrame + 1);
     else
         errordlg('Already displaying last frame');
     end
@@ -627,6 +683,7 @@ if ~isempty(frames) && lastFrame > 0 && currFrame > 0
         setappdata(handles.GUI, 'currFrame', currFrame - 1);
         set(handles.currFrameLabel, 'String', ['frame: ' ...
             num2str(currFrame - 1)]);
+        set(handles.FrameSlider, 'Value', currFrame - 1);
     else
         errordlg('Already displaying first frame');
     end
@@ -713,9 +770,9 @@ function LoadDataBtn_Callback(hObject, eventdata, handles)
 filePathProc = getappdata(handles.GUI, 'filePathProc');
 embryoNum = getappdata(handles.GUI, 'embryoNum');
 dateU = getappdata(handles.GUI, 'dateU');
-type = getappdata(handles.GUI, 'type');
+measType = getappdata(handles.GUI, 'measType');
 
-if isequal(type, 'Human')
+if isequal(measType, 'Human')
     extraString = '_human';
 else
     extraString = '';
@@ -769,17 +826,14 @@ function FrameSlider_Callback(hObject, eventdata, handles)
 frames = getappdata(handles.GUI, 'frames');
 value = get(hObject,'Value');
 currFrame = getappdata(handles.GUI, 'currFrame');
+lastFrame = getappdata(handles.GUI, 'lastFrame');
 
-if ~isempty(frames) && lastFrame > 0 && currFrame > 0
-    if currFrame > 1
+if ~isempty(frames)
         axes(handles.MeasAxes);
-        imshow(frames(:,:,currFrame - 1));
-        setappdata(handles.GUI, 'currFrame', currFrame - 1);
+        imshow(frames(:,:, round(value)));
+        setappdata(handles.GUI, 'currFrame', round(value));
         set(handles.currFrameLabel, 'String', ['frame: ' ...
-            num2str(currFrame - 1)]);
-    else
-        errordlg('Already displaying first frame');
-    end
+            num2str(uint8(round(value)))]);
 else
     errordlg('Error: no frames loaded');
 end
@@ -796,3 +850,5 @@ function FrameSlider_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+

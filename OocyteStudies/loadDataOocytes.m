@@ -3,7 +3,7 @@
 function outputStruct = loadDataOocytes()
 
 outputStruct = struct;
-numExperiments = 9;
+numExperiments = 11;
 experimentType = zeros(1,numExperiments); % 0 is non-fert, 1 is fert
 dateList = cell(1,numExperiments);
 numOocytes = zeros(1,numExperiments); % total num in experimental group
@@ -194,6 +194,42 @@ hatchInfo{9} = NaN*ones(1,15);
 maturationEnv{9} = zeros(1,15);
 k1ScaleFactor(9) = 0;
 morphologyInfo{9} = [1 1 2 2 2 2 2 2 2 2 1 1 2 2 2];
+
+% 5-6-16
+% 3 hr post hCG collection
+% 0.1 psi used
+% morphology measured at ? mark
+% oocytes collected 1 hr post hCG, 30 measured + 23 controls
+% mech measurement done every 3 hrs
+experimentType(10) = 0;
+dateList{10} = '5-6-16';
+numOocytes(10) = 53; 
+oocyteNums{10} = [1:30 101:123];
+fertInfo{10} = NaN*ones(1,53);
+blastForm{10} = NaN*ones(1,53);
+hatchInfo{10} = NaN*ones(1,53);
+maturationEnv{10} = [2*ones(1,15) ones(1,38)];
+k1ScaleFactor(10) = 0.0314;
+morphologyInfo{10} = [];
+
+
+% 5-19-16
+% Did IVF
+% 0.1 psi used
+% morphology measured at 13 hr mark
+% oocytes collected 8 hrs post hCG, were mostly immature
+% mech measurement done at 13 hrs post hCG, fertilization done at 14 hrs post hCG
+experimentType(11) = 1;
+dateList{11} = '5-19-16';
+numOocytes(11) = 35; 
+oocyteNums{11} = 1:35;
+fertInfo{11} = [0 1 zeros(1,33)];
+blastForm{11} = zeros(1,35);
+hatchInfo{11} = zeros(1,35);
+maturationEnv{11} = zeros(1,35);
+k1ScaleFactor(11) = 0.0314;
+morphologyInfo{11} = [1 1 2 2 2 2 2 2 2 2 1 1 2 2 2];
+
 
 
 

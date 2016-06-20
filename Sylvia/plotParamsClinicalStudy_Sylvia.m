@@ -1,6 +1,168 @@
 % plot params for all patients in clinical study
 % Livia Zarnescu Yanez 11-10-15
 
+
+
+%% 1. Load in a single data file
+% and plot it
+
+
+filePath = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E1.mat'
+load(filePath)
+
+x1 = k0
+y1 = k1
+
+filePath2 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E2.mat'
+load(filePath2)
+x2 = k0
+y2 = k1
+
+filePath3 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E3.mat'
+load(filePath3)
+
+x3 = k0
+y3 = k1
+
+filePath4 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E4.mat'
+load(filePath4)
+
+x4 = k0
+y4 = k1
+
+filePath5 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E5.mat'
+load(filePath5)
+x5 = k0
+y5 = k1
+
+filePath6 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E6.mat'
+load(filePath6)
+x6 = k0
+y6 = k1
+
+filePath7 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E7.mat'
+load(filePath7)
+x7 = k0
+y7 = k1
+
+filePath8 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E8.mat'
+load(filePath8)
+x8 = k0
+y8 = k1
+
+filePath9 = '\Users\Livia\Desktop\IVF\Processed Data\Human\MECH001\MECH001_E9.mat'
+load(filePath9)
+x9 = k0
+y9 = k1
+
+figure
+plot(x1,y1,x2,y2,x3,y3,x4,y4,x5,y5,x6,y6,x7,y7,x8,y8,x9,y9, 'marker','*')
+
+
+
+
+%%
+
+params = loadDataClinicalStudy_Sylvia();
+
+
+baseFilePath = '\Users\Livia\Desktop\IVF\Processed Data\Human\';
+patientName = 'MECH00';
+numPatients = 22;
+numEmbryos = [9 0 14 13 10 7 0 11 13 6 9 0 21 13 0 11 7 0 6 0 6 9]; % finish filling this in];
+
+
+% these are the variables which will store all the loaded data
+% they are initialized as empty vectors
+k1list = [];
+k0list = [];
+n0list = [];
+n1list = [];
+viability = [];
+colorMat = [];
+ICSI = [];
+outcomeInfo =[];
+patientAge = [];
+patientBMI = [];
+
+
+
+% this is the for loop which will do the same thing multiple times
+% it takes a variable i which changes value each time the loop is executed
+for i = 1:numPatients
+    for j = 1:numEmbryos(i)
+        
+        % this statement will print the value of i and j each time the loop is
+        % executed
+        fprintf('%f\n', i);
+        fprintf('%f\n', j);
+        
+        
+        if (i < 10)
+            currPatientName = ['MECH00' num2str(i)]
+        else
+            currPatientName = ['MECH0' num2str(i)]
+        end
+        
+        
+        
+        % step 1: construct the file path for the current embryo
+        currFilePath = [baseFilePath currPatientName '\' ...
+            currPatientName '_E' num2str(j) '.mat'] % complete this
+        
+        % step 2: load the file at that path
+        load(currFilePath);
+        
+        
+        % step 3: add the loaded data to a vector
+        k1list = [k1list k1]; % and so on
+        k0list = [k0list k0];
+        n0list = [n0list n0];
+        n1list = [n1list n1];
+        
+        outcomeInfo = [outcomeInfo params.outcomeInfo{i}(j)];
+        ICSI = [ICSI params.ICSI{i}(j)]
+        patientAge = [patientAge params.patientAge{i}]
+        
+        
+        if params.outcomeInfo{i}(j) == 1
+            if params.ICSI {i}(j) == 1
+                colorMat = [colorMat; [.9 .5 0]];
+            else
+                colorMat = [colorMat; [0 .6 0]];
+            end
+        else
+            if params.ICSI {i}(j) == 1
+                colorMat = [colorMat; [0 0 .8]];
+            else
+                colorMat = [colorMat; [1 0 0]];
+            end
+        end
+        
+        
+        
+    end
+end
+
+% only make scatterplot of data with ICSI == 1
+
+
+
+% now make a scatterplot of all the data you loaded in
+close all;
+figure;
+scatter3(k1list, outcomeInfo, ICSI, 100, colorMat, 'filled');
+
+
+
+
+
+
+
+
+
+%% 1. Load in data
+
 params = loadDataClinicalStudy();
 numParticipants = params.numParticipants;
 participantIDs = params.participantIDs;
@@ -12,6 +174,8 @@ blastM = params.blastM;
 ICSI = params.ICSI;
 PGD = params.PGD;
 gender = params.gender;
+patientAge = params.patientAge;
+
 totalNumEmbryos = sum(numEmbryos);
 procDataPath = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human\';
 
@@ -43,12 +207,12 @@ for i = 1:numParticipants
     if ptsToPlot(i)
         i
         for j = 1:numEmbryos(i)
-
+            
             currE = currE + 1;
             currDataPath = [procDataPath participantIDs{i} '\' ...
                 participantIDs{i} '_E' num2str(j) '.mat'];
             ptList = [ptList i];
-
+            
             % save embryo params and color
             if exist(currDataPath, 'file') && (ICSI{i}(j)== 0)
                 load(currDataPath);
@@ -63,7 +227,7 @@ for i = 1:numParticipants
                 zList = [zList zygoteM{i}(j)];
                 aText = [aText currE];
                 cText = {cText{:}, ['P', num2str(i), '\_E', num2str(j)]};
-%                 cText = {cText{:}, num2str(j)};
+                %                 cText = {cText{:}, num2str(j)};
                 
                 aPad = padarray(A,[0,65-length(A)],'replicate', 'post');
                 aList = [aList; aPad(1:65)];
@@ -101,10 +265,10 @@ for i = 1:numParticipants
                     colorMat = [colorMat; [.85 .65 .2]];
                 end
                 
-%                 if outcomeInfo{i}(j) == 2 % unknown
-%                     mList(end) = 2;
-%                     colorMat(end,:) = [1 0 0];
-%                 end
+                %                 if outcomeInfo{i}(j) == 2 % unknown
+                %                     mList(end) = 2;
+                %                     colorMat(end,:) = [1 0 0];
+                %                 end
                 
                 % implantation/pregnancy color coding
                 if outcomeInfo{i}(j) == 10 % no hCG rise
@@ -121,24 +285,24 @@ for i = 1:numParticipants
                     mList(end) = 12;
                     colorMat(end,:) = [0 .5 0];
                 end
-
-                    % ICSI / IVF color coding
-%                     if ICSI{i}(j) == 1
-%                         colorMat(end,:) = [.2 .6 .9];
-%                     elseif ICSI{i}(j) == 0
-%                         colorMat(end,:) = [.85 .65 .2];
-%                     end
-                    
-                    % PGD color coding
-%                   if PGD{i}(j) == 1
-%                       colorMat(end,:) = [.2 .6 .9]; % euploid
-%                   elseif PGD{i}(j) == 0
-%                       colorMat(end,:) = [.85 .65 .2]; % aneuploid
-%                   else 
-%                       k1list(end) = NaN;
-%                   end
-
-
+                
+                % ICSI / IVF color coding
+                %                     if ICSI{i}(j) == 1
+                %                         colorMat(end,:) = [.2 .6 .9];
+                %                     elseif ICSI{i}(j) == 0
+                %                         colorMat(end,:) = [.85 .65 .2];
+                %                     end
+                
+                % PGD color coding
+                %                   if PGD{i}(j) == 1
+                %                       colorMat(end,:) = [.2 .6 .9]; % euploid
+                %                   elseif PGD{i}(j) == 0
+                %                       colorMat(end,:) = [.85 .65 .2]; % aneuploid
+                %                   else
+                %                       k1list(end) = NaN;
+                %                   end
+                
+                
                 
             else
                 colorMat = [colorMat; [NaN NaN NaN]];
@@ -171,9 +335,11 @@ transfer1 = k1list(mList==10);
 transfer2 = n1list(mList==10);
 transferC = colorMat(mList==10,:);
 
+%% 2. Plot
+
 % now plot!
-p1 = k1list;
-p2 = n1list; %n1list;
+p1 = taulist;
+p2 = blastScore; %n1list;
 % p3 = ptList; %zList + .1*randn(1,length(zList));
 
 
@@ -188,16 +354,16 @@ hold on;
 set(h, 'Marker', 'o');
 set(gca, 'FontSize', 14);
 title('Blastocyst morphology vs mechanics');
-xlabel('k1 parameter');
-ylabel('n1 parameter');
+xlabel('tau parameter');
+ylabel('blastScore');
 % zlabel('zygote morphology');
 % axis([min(p1) max(p1) min(p2) max(p2) min(p3) max(p3)]);
 % set(gca, 'yscale', 'log')
 % axis([min(p1) max(p1) min(p3) max(p3)]);
 % set(gca, 'zscale', 'linear');
-grid on;
-xlim([.3 .8]);
-ylim([0 .8]);
+% grid on;
+% xlim([.3 .8]);
+% ylim([0 .8]);
 
 b = num2str(aText');
 c = cellstr(b);

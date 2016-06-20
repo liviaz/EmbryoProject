@@ -1,6 +1,6 @@
 % load outcome data clinical study
 
-function outputStruct = loadDataClinicalStudy()
+function outputStruct = loadDataClinicalStudy_Sylvia()
 
 % outcomeInfo: 10 = transfer, no hCG rise; 11 = transfer, hCG rise, no pregnancy; 
 %              12 = transfer, confirmed pregnancy ultrasound
@@ -21,6 +21,9 @@ ICSI = cell(1,numParticipants);
 PGD = cell(1,numParticipants);
 gender = cell(1,numParticipants); % 0 = male, 1 = female
 patientAge = zeros(1,numParticipants);
+patientBMI = zeros(1,numParticipants);
+
+
 
 % EMECH-001
 % 10-3-15
@@ -34,6 +37,9 @@ blastM{1} = {'', '', '6BB', '5AA', '5BB', '', '5BB', '', ''};
 ICSI{1} = ones(1,9);
 PGD{1} = [NaN NaN 1 1 0 NaN 0 NaN NaN];
 gender{1} = [NaN NaN 0 0 0 NaN 0 NaN NaN];
+patientAge(1) = 41;
+patientBMI(1) = 34.94;
+
 
 % EMECH-002
 % exited from study due to low oocyte count
@@ -46,6 +52,8 @@ blastM{2} = {};
 ICSI{2} = [];
 PGD{2} = [];
 gender{2} = [];
+patientAge(2) = 36;
+patientBMI(2) = 21.99;
 
 % EMECH-003
 % 10-23-15
@@ -61,6 +69,8 @@ blastM{3} = {'5BB', '5BA', '3BB', '3BB', '4BA', '5AA', '5BB', '5BB', ...
 ICSI{3} = ones(1,14);
 PGD{3} = [1 1 1 1 1 1 0 0 1 NaN NaN 1 NaN NaN];
 gender{3} = [0 1 0 0 1 1 1 1 0 NaN NaN 0 NaN NaN];
+patientAge(3) = 40;
+patientBMI(3) = 27.72;
 
 % EMECH-004
 % 10-23-15
@@ -75,6 +85,8 @@ blastM{4} = {'2CC', '', '1CC', '1', '', '', '', '', '', '', '', '5CC', ''};
 ICSI{4} = ones(1,13);
 PGD{4} = NaN*ones(1,13);
 gender{4} = NaN*ones(1,13);
+patientAge(4) = 35;
+patientBMI(4) = 20.86;
 
 % EMECH-005
 % 10-25-15
@@ -87,6 +99,8 @@ blastM{5} = {'5BB', '', '6BB', '6AA', '', '5BB', '', '5BB', '', '5BB'};
 ICSI{5} = [0 0 0 ones(1,7)];
 PGD{5} = NaN*ones(1,10);
 gender{5} = NaN*ones(1,10);
+patientAge(5) = 34;
+patientBMI(5) = 21.77;
 
 % EMECH-006
 % 11-9-15, last 2 embryos were 1PNs
@@ -101,6 +115,8 @@ blastM{6} = {'', '', '6BB', '5BC', '', '3BC', ''};
 ICSI{6} = ones(1,7);
 PGD{6} = [NaN NaN 1 1 NaN 1 NaN];
 gender{6} = [NaN NaN 1 1 NaN 1 NaN];
+patientAge(6) = 35;
+patientBMI(6) = 23.51;
 
 % EMECH-007
 % only 1 follicle, exited from study
@@ -113,6 +129,8 @@ blastM{7} = {};
 ICSI{7} = [];
 PGD{7} = [];
 gender{7} = [];
+patientAge(7) = 35;
+patientBMI(7) = 26.32;
 
 % EMECH-008
 % 11-11-15
@@ -127,6 +145,8 @@ blastM{8} = {'', '', '', '', '6BB', '', '', '', '1', '', ''};
 ICSI{8} = zeros(1,11);
 PGD{8} = [NaN NaN NaN NaN 0 NaN NaN NaN 0 NaN NaN];
 gender{8} = [NaN NaN NaN NaN 0 NaN NaN NaN 0 NaN NaN];
+patientAge(8) = 40;
+patientBMI(8) = 32.89;
 
 % EMECH-009
 % 12-2-15
@@ -141,6 +161,8 @@ blastM{9} = {'5BB', '', '5BC', '2', '', '5BB', '', '6BB', '5AB', ...
 ICSI{9} = zeros(1,13);
 PGD{9} = [0 NaN 0 0 NaN 0 NaN 0 1 0 NaN 0 NaN];
 gender{9} = [0 NaN 0 1 NaN 1 NaN 0 1 0 NaN 0 NaN];
+patientAge(9) = 41;
+patientBMI(9) = 29.97;
 
 % EMECH-010
 % 11-27-15
@@ -155,6 +177,8 @@ blastM{10} = {'', '', '', '3DB', '', ''};
 ICSI{10} = ones(1,6);
 PGD{10} = NaN*ones(1,6);
 gender{10} = NaN*ones(1,6);
+patientAge(10) = 44;
+patientBMI(10) = 23.38;
 
 % EMECH-011
 % 12-4-15
@@ -168,6 +192,8 @@ blastM{11} = {'', '', '', '', '', '', '', '', ''};
 ICSI{11} = zeros(1,9);
 PGD{11} = NaN*ones(1,9);
 gender{11} = NaN*ones(1,9);
+patientAge(11) = 30;
+patientBMI(11) = 24.26;
 
 % EMECH-012
 % not enough oocytes
@@ -180,6 +206,8 @@ blastM{12} = {};
 ICSI{12} = [];
 PGD{12} = [];
 gender{12} = [];
+patientAge(12) = 39;
+patientBMI(12) = 29.92;
 
 % EMECH-013
 % 12-13-15
@@ -199,6 +227,8 @@ blastM{13} = {'6BB', '5AA', '5BA', '', '', '', '', '', '5CB', '', '6CB', ...
 ICSI{13} = zeros(1,21);
 PGD{13} = [1 1 1 NaN NaN NaN NaN NaN 0 NaN 0 1 0 NaN NaN 1 NaN NaN NaN 1 NaN];
 gender{13} = [0 1 0 NaN NaN NaN NaN NaN 0 NaN 0 1 1 NaN NaN 0 NaN NaN NaN 1 NaN];
+patientAge(13) = 38;
+patientBMI(13) = 22.35;
 
 
 % EMECH-014
@@ -213,6 +243,8 @@ blastM{14} = {'', '', '', '6AA', '5BB', '5AB', '5BB', '6AB', '2', '', '', '6AB',
 ICSI{14} = [zeros(1,8) ones(1,5)];
 PGD{14} = [NaN NaN NaN 1 1 0 0 1 0 NaN NaN 1 0];
 gender{14} = [NaN NaN NaN 1 1 0 0 0 0 NaN NaN 1 1];
+patientAge(14) = 31;
+patientBMI(14) = 26.18;
 
 % EMECH-015
 % not started cycle yet
@@ -225,6 +257,8 @@ blastM{15} = {};
 ICSI{15} = [];
 PGD{15} = [];
 gender{15} = [];
+patientAge(15) = 35;
+patientBMI(15) = 19.3;
 
 % EMECH-016
 % 2-21-16
@@ -237,6 +271,8 @@ blastM{16} = {'', '5CB', '', '', '', '', '', '5BB', '', '5AA', ''};
 ICSI{16} = ones(1,11);
 PGD{16} = [NaN 0 NaN NaN NaN NaN NaN 0 NaN 1 NaN];
 gender{16} = [NaN 0 NaN NaN NaN NaN NaN 0 NaN 0 NaN];
+patientAge(16) = 34;
+patientBMI(16) = 28.18;
 
 
 % EMECH-017
@@ -251,6 +287,8 @@ blastM{17} = {'5BB', '', '5BB', '', '6AB', '6BB', ''};
 ICSI{17} = zeros(1,10);
 PGD{17} = [0 NaN 1 NaN 1 0 NaN];
 gender{17} = [0 NaN 1 NaN 0 1 NaN];
+patientAge(17) = 35;
+patientBMI(17) = 28.59;
 
 % EMECH-018
 % 3-16-16 
@@ -264,6 +302,8 @@ blastM{18} = {};
 ICSI{18} = [];
 PGD{18} = [];
 gender{18} = [];
+patientAge(18) = 39;
+patientBMI(18) = 22.78;
 
 % EMECH-019
 % 3-26-16
@@ -276,6 +316,8 @@ blastM{19} = {'5AB', '', '', '5BB', '', ''};
 ICSI{19} = ones(1,6);
 PGD{19} = [0 NaN NaN 1 NaN NaN];
 gender{19} = [0 NaN NaN 1 NaN NaN];
+patientAge(19) = 24;
+patientBMI(19) = 24.87;
 
 % EMECH-020
 % 3-29-16
@@ -289,6 +331,8 @@ blastM{20} = {};
 ICSI{20} = [];
 PGD{20} = [];
 gender{20} = [];
+patientAge(20) = 43;
+patientBMI(20) = 23.35;
 
 % EMECH-021
 % 4-2-16
@@ -301,6 +345,8 @@ blastM{21} = {'', '2', '', '6AA', '5BB', ''};
 ICSI{21} = ones(1,6);
 PGD{21} = [NaN 1 NaN 0 1 NaN];
 gender{21} = [NaN 0 NaN 0 1 NaN];
+patientAge(21) = 42;
+patientBMI(21) = 18.88;
 
 % EMECH-022
 % 4-4-16
@@ -313,6 +359,8 @@ blastM{22} = {'4BA', '4BB', '', '', '5AB', '', '5BB', '', ''};
 ICSI{22} = zeros(1,9);
 PGD{22} = [0 0 NaN NaN 1 NaN 0 NaN NaN];
 gender{22} = [0 0 NaN NaN 0 NaN 1 NaN NaN];
+patientAge(22) = 39;
+patientBMI(22) = 20.97;
 
 
 outputStruct.numParticipants = numParticipants;
@@ -326,9 +374,7 @@ outputStruct.ICSI = ICSI;
 outputStruct.PGD = PGD;
 outputStruct.gender = gender;
 outputStruct.patientAge = patientAge;
-
-
-
+outputStruct.patientBMI = patientBMI;
 
 
 
