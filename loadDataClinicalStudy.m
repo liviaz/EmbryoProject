@@ -20,7 +20,7 @@ zygoteM = cell(1,numParticipants); % graded by me, 1 = worst, 2 = ok, 3 = best
 ICSI = cell(1,numParticipants);
 PGD = cell(1,numParticipants);
 gender = cell(1,numParticipants); % 0 = male, 1 = female
-patientAge = zeros(1,numParticipants);
+
 
 % EMECH-001
 % 10-3-15

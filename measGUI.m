@@ -100,6 +100,8 @@ if exist(settingsFileName, 'file')
     set(handles.RawDataLabel, 'String', filePathRaw);
     set(handles.ProcDataLabel, 'String', filePathProc);
     set(handles.PipSizeEdit, 'String', num2str(pipSize));
+    set(handles.EmbryoNameEdit, 'String', embryoNum);
+
     
     
 else
@@ -152,19 +154,22 @@ function GUI_CloseRequestFcn(hObject, eventdata, handles)
 % write current data to a temp file to save for next time the function is
 % opened
 settingsFileName = 'C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\GUIsettings.mat';
-settingsToSave = getappdata(handles.GUI)';
 
-% clear structs and potentially large variables
-if isfield(settingsToSave, 'GUIDEOptions')
-    settingsToSave = rmfield(settingsToSave,'GUIDEOptions');
+if isstruct(handles)
+    settingsToSave = getappdata(handles.GUI)';
+    
+    % clear structs and potentially large variables
+    if isfield(settingsToSave, 'GUIDEOptions')
+        settingsToSave = rmfield(settingsToSave,'GUIDEOptions');
+    end
+    if isfield(settingsToSave, 'UsedByGUIData_m')
+        settingsToSave = rmfield(settingsToSave,'UsedByGUIData_m');
+    end
+    if isfield(settingsToSave, 'frames')
+        settingsToSave = rmfield(settingsToSave,'frames');
+    end
+    save(settingsFileName, '-struct', 'settingsToSave');
 end
-if isfield(settingsToSave, 'UsedByGUIData_m')
-    settingsToSave = rmfield(settingsToSave,'UsedByGUIData_m');
-end
-if isfield(settingsToSave, 'frames')
-    settingsToSave = rmfield(settingsToSave,'frames');
-end
-save(settingsFileName, '-struct', 'settingsToSave');
 
 % Hint: delete(hObject) closes the figure
 delete(hObject);
@@ -324,6 +329,8 @@ function EmbryoNameEdit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
 
 
 % --- Executes on button press in ManualMeasure.

@@ -37,8 +37,8 @@ blastM{1} = {'', '', '6BB', '5AA', '5BB', '', '5BB', '', ''};
 ICSI{1} = ones(1,9);
 PGD{1} = [NaN NaN 1 1 0 NaN 0 NaN NaN];
 gender{1} = [NaN NaN 0 0 0 NaN 0 NaN NaN];
-patientAge(1) = 41;
-patientBMI(1) = 34.94;
+patientAge(1) = 42;
+patientBMI(1) = 43.52;
 
 
 % EMECH-002
@@ -52,8 +52,8 @@ blastM{2} = {};
 ICSI{2} = [];
 PGD{2} = [];
 gender{2} = [];
-patientAge(2) = 36;
-patientBMI(2) = 21.99;
+patientAge(2) = NaN;
+patientBMI(2) = NaN;
 
 % EMECH-003
 % 10-23-15
@@ -69,8 +69,8 @@ blastM{3} = {'5BB', '5BA', '3BB', '3BB', '4BA', '5AA', '5BB', '5BB', ...
 ICSI{3} = ones(1,14);
 PGD{3} = [1 1 1 1 1 1 0 0 1 NaN NaN 1 NaN NaN];
 gender{3} = [0 1 0 0 1 1 1 1 0 NaN NaN 0 NaN NaN];
-patientAge(3) = 40;
-patientBMI(3) = 27.72;
+patientAge(3) = 34;
+patientBMI(3) = 28.18;
 
 % EMECH-004
 % 10-23-15
@@ -85,8 +85,8 @@ blastM{4} = {'2CC', '', '1CC', '1', '', '', '', '', '', '', '', '5CC', ''};
 ICSI{4} = ones(1,13);
 PGD{4} = NaN*ones(1,13);
 gender{4} = NaN*ones(1,13);
-patientAge(4) = 35;
-patientBMI(4) = 20.86;
+patientAge(4) = 44;
+patientBMI(4) = 31.57;
 
 % EMECH-005
 % 10-25-15
@@ -99,8 +99,8 @@ blastM{5} = {'5BB', '', '6BB', '6AA', '', '5BB', '', '5BB', '', '5BB'};
 ICSI{5} = [0 0 0 ones(1,7)];
 PGD{5} = NaN*ones(1,10);
 gender{5} = NaN*ones(1,10);
-patientAge(5) = 34;
-patientBMI(5) = 21.77;
+patientAge(5) = 30;
+patientBMI(5) = 24.26;
 
 % EMECH-006
 % 11-9-15, last 2 embryos were 1PNs
@@ -115,8 +115,8 @@ blastM{6} = {'', '', '6BB', '5BC', '', '3BC', ''};
 ICSI{6} = ones(1,7);
 PGD{6} = [NaN NaN 1 1 NaN 1 NaN];
 gender{6} = [NaN NaN 1 1 NaN 1 NaN];
-patientAge(6) = 35;
-patientBMI(6) = 23.51;
+patientAge(6) = 34;
+patientBMI(6) = 21.77;
 
 % EMECH-007
 % only 1 follicle, exited from study
@@ -129,8 +129,8 @@ blastM{7} = {};
 ICSI{7} = [];
 PGD{7} = [];
 gender{7} = [];
-patientAge(7) = 35;
-patientBMI(7) = 26.32;
+patientAge(7) = 38;
+patientBMI(7) = 25.47;
 
 % EMECH-008
 % 11-11-15
@@ -145,8 +145,8 @@ blastM{8} = {'', '', '', '', '6BB', '', '', '', '1', '', ''};
 ICSI{8} = zeros(1,11);
 PGD{8} = [NaN NaN NaN NaN 0 NaN NaN NaN 0 NaN NaN];
 gender{8} = [NaN NaN NaN NaN 0 NaN NaN NaN 0 NaN NaN];
-patientAge(8) = 40;
-patientBMI(8) = 32.89;
+patientAge(8) = 36;
+patientBMI(8) = 34.61;
 
 % EMECH-009
 % 12-2-15

@@ -49,7 +49,14 @@ end
 
 t = t(t < params.cropVal);
 aspiration_depth = aspiration_depth(1:length(t));
-A = (aspiration_depth - 6) * 40 * 10^-6 / params.convFactor; % convert from pixels to meters
+
+if isfield(params, 'offsetVal')
+    offsetVal = params.offsetVal;
+else
+    offsetVal = 6;
+end
+
+A = (aspiration_depth - offsetVal) * 40 * 10^-6 / params.convFactor; % convert from pixels to meters
 
 tauTryList = .02:.02:.2;
 fValList = [];
@@ -66,8 +73,11 @@ for kk = 1:length(tauTryList)
     fValList = [fValList fval];
 end
 
-axes(handles.PlotAxes);
-cla;
+if(isfield(handles, 'PlotAxes')
+    axes(handles.PlotAxes);
+    cla;
+end
+
 start_params(3) = tauTryList(fValList == min(fValList));
 [xfine yfit k0 k1 n0 n1 F0 tau fval] = KelvinFit3(t, A, Fin, 1, start_params);
 
@@ -95,7 +105,7 @@ if manualMeasure
     save([filePathProc '\' procFileName num2str(embryoNum) ...
         '.mat'], 'xfine', 'yfit', ...
         'k0', 'k1', 'n0', 'n1', 'tau', 'F0', 'fval', 't', ...
-        'aspiration_depth', 'A');
+        'aspiration_depth', 'A', 'offsetVal');
 
 else
     
@@ -112,8 +122,10 @@ else
     save([filePathProc '\' procFileName num2str(embryoNum) ...
         '.mat'], 'xfine', 'yfit', ...
         'k0', 'k1', 'n0', 'n1', 'tau', 'F0', 'fval', 't', ...
-        'aspiration_depth', 'A');
+        'aspiration_depth', 'A', 'offsetVal');
 
 end
 
-set(handles.MeasPipBtn, 'Enable', 'on');
+if(isfield(handles, 'MeasPipBtn'))
+    set(handles.MeasPipBtn, 'Enable', 'on');
+end

@@ -15,6 +15,7 @@ hatchInfo = params.hatchInfo;
 maturationEnv = params.maturationEnv;
 k1ScaleFactor = params.k1ScaleFactor;
 morphologyInfo = params.morphologyInfo;
+measHour = params.measHour;
 
 procDataPath = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\';
 
@@ -32,16 +33,17 @@ aList = [];
 matEnv = [];
 legendParam = [];
 oocyteM = [];
+measHourList = [];
 currE = 0;
 
 
-exptsToPlot = [1 1 1 1 1 1 1 1 1];
+exptsToPlot = [1 1 1 1 1 1 1 1 1 1 1 1];
 aText = [];
 cText = {};
 
 % load in params by participant and embryo num
 for i = 1:numExperiments
-    if exptsToPlot(i)
+    if exptsToPlot(i) && experimentType(i)
         
         currDate = dateList{i}
         currDateU = strrep(currDate,'-','_');
@@ -68,7 +70,7 @@ for i = 1:numExperiments
             end
             
             % save embryo params and color
-            if exist(currDataPath, 'file') && (maturationEnv{i}(j) == 0) && (morphologyInfo{i}(j) > -1)
+            if exist(currDataPath, 'file') && (morphologyInfo{i}(j) > -1) && (maturationEnv{i}(j) == 0)
                 
                 load(currDataPath);
                 
@@ -83,27 +85,40 @@ for i = 1:numExperiments
                 oocyteM = [oocyteM morphologyInfo{i}(j)];
                 matEnv = [matEnv maturationEnv{i}(j)];
                 aText = [aText currE];
+                measHourList = [measHourList measHour(i)];
                 cText = {cText{:}, [currDate, '\_E', num2str(oocyteNums{i}(j))]};
                 
                 aPad = padarray(A,[0,65-length(A)], 'replicate', 'post');
                 aList = [aList; aPad(1:65)];
                 
                 % color code based on fertilization and blast formation
-                legendParamNums = 4;
+                legendParamNums = 3;
                 if (fertList(end) == 0)
                     legendParam = [legendParam 1];
                     colorMat = [colorMat; [.85 .65 .2]]; % no fert
-                elseif (blastList(end) == 0)
-                    legendParam = [legendParam 2];
-                    colorMat = [colorMat; [.2 .8 .2]];%[.9 .2 .8]]; % fert, no blast
                 elseif (hatchList(end) == 0)
-                    legendParam = [legendParam 3];
-                    colorMat = [colorMat; [.2 .8 .2]];% [.2 .6 .9]]; % fert, blast
+                    legendParam = [legendParam 2];
+                    colorMat = [colorMat; [.9 .2 .8]]; % fert, no blast
                 else
-                    legendParam = [legendParam 4];
-                    colorMat = [colorMat; [.2 .8 .2]]; % hatch
+                    legendParam = [legendParam 3];
+                    colorMat = [colorMat; [0 .2 .8]]; % fert, blast
                 end
                 
+
+%                 % colorcode based on fertilization time
+%                 legendParamNums = 3;
+%                 if measHour(i) == 12
+%                     legendParam = [legendParam 1];
+%                     colorMat = [colorMat; [0 .2 .8]];%[.85 .65 .2]]; % 12 hrs
+%                 elseif measHour(i) == 16
+%                     legendParam = [legendParam 2];
+%                     colorMat = [colorMat; [.5 .5 .5]]; % 16 hrs
+%                 elseif measHour(i) == 20
+%                     legendParam = [legendParam 3];
+%                     colorMat = [colorMat; [.8 .2 .8]]; % 20 hrs
+%                 end 
+                    
+
                 % colorcode based on maturation environment
 %                 legendParamNums = 3;
 %                 if (maturationEnv{i}(j) == 0)
@@ -145,6 +160,7 @@ for i = 1:numExperiments
                 legendParam = [legendParam NaN];
                 aList = [aList; NaN*zeros(1,65)];
                 aText = [aText NaN];
+                measHourList = [measHourList NaN];
                 cText = {cText{:}, ''};
             end
         end
@@ -165,8 +181,17 @@ for i = 1:length(k1list)
     i
     if ~isnan(legendParam(i))
         i
-        h{i} = plot(p1(i), p2(i), 'marker', 'o', 'markeredgecolor', ...
-            colorMat(i,:), 'markersize', 12, 'color', 'none', 'linewidth', 4);
+%         h{i} = plot(p1(i), p2(i), 'marker', 'o', 'markeredgecolor', ...
+%             colorMat(i,:), 'markersize', 12, 'color', 'none', ...
+%             'linewidth', 4);
+
+        theta = 0:0.1:(2*pi);     
+        xPatch = cos(theta)*(max(p1) - min(p1))/50 + p1(i);
+        yPatch = sin(theta)*(max(p2) - min(p2))/50 + p2(i);
+
+        h{i} = patch('xdata', xPatch, 'ydata', yPatch, 'edgecolor', colorMat(i,:), ...
+            'facecolor', colorMat(i,:), 'facealpha', .6);
+
         hold on;
         if isempty(hLegend{legendParam(i)})
             i
@@ -175,15 +200,16 @@ for i = 1:length(k1list)
     end
 end
 
-2
 set(gca, 'FontSize', 14);
-title('Oocyte outcomes vs mechanics');
+title('Oocyte mechanics vs development');
 grid on;
-% axis([.03 .09 0 11]);
+axis([.06 .145 -0.5 11]);
 xlabel('k_1 parameter');
 ylabel('\eta_1 parameter');
-legend([hLegend{1}, hLegend{2}, hLegend{3}, hLegend{4}], ...
-    {'Non fert', 'Fert', 'Early blast', 'Hatching'}, 'Location', 'NorthEast');
+legend([hLegend{1}, hLegend{2}, hLegend{3}], ...
+    {'No fert', 'Fert', 'Hatched blast'}, 'Location', 'NorthEast');
+% legend([hLegend{1}, hLegend{2}, hLegend{3}], ...
+%     {'12 hr', '16 hr', '20 hr'}, 'Location', 'NorthEast');
 % legend([hLegend{1}, hLegend{2}, hLegend{3}], ...
 %     {'In vivo', 'MM', 'KSOM'}, 'Location', 'NorthEast');
 % legend([hLegend{1}, hLegend{2}, hLegend{3}], ...
@@ -377,40 +403,85 @@ xlim([0 3]);
 
 figure(5);
 clf;
+paramToPlot = n1list;
+
 
 % Non-ferts
-k00 = bar(.5, mean(k1list(fertList == 0 & matEnv == 0)), .8, 'facecolor', [.8 1 1]);
+k00 = bar(.5, mean(paramToPlot(fertList == 0 & matEnv == 0)), .8, 'facecolor', [.85 .65 .2]);
 hold on;
-ek00 = terrorbar(.5, mean(k1list(fertList == 0 & matEnv == 0)), std(k1list(fertList == 0 & matEnv == 0)), .1);
+ek00 = terrorbar(.5, mean(paramToPlot(fertList == 0 & matEnv == 0)), std(paramToPlot(fertList == 0 & matEnv == 0)), .1);
 set(ek00, 'color', 'k', 'linewidth', 2);
 
 % Fert, no blast
-k01 = bar(1.5, mean(k1list(fertList == 1 & hatchList == 0 & matEnv == 0)), .8, 'facecolor', [.8 1 1]);
+k01 = bar(1.5, mean(paramToPlot(fertList == 1 & hatchList == 0 & matEnv == 0)), .8, 'facecolor', [.9 .2 .8]);
 hold on;
-ek01 = terrorbar(1.5, mean(k1list(fertList == 1 & hatchList == 0 & matEnv == 0)), ...
-    std(k1list(fertList == 1 & hatchList == 0 & matEnv == 0)), .1);
+ek01 = terrorbar(1.5, mean(paramToPlot(fertList == 1 & hatchList == 0 & matEnv == 0)), ...
+    std(paramToPlot(fertList == 1 & hatchList == 0 & matEnv == 0)), .1);
 set(ek01, 'color', 'k', 'linewidth', 2);
 
 % Fert + hatched blast
-k02 = bar(2.5, mean(k1list(hatchList == 1 & matEnv == 0)), .8, 'facecolor', [.8 1 1]);
+k02 = bar(2.5, mean(paramToPlot(hatchList == 1 & matEnv == 0)), .8, 'facecolor', [0 .2 .8]);
 hold on;
-ek02 = terrorbar(2.5, mean(k1list(hatchList == 1 & matEnv == 0)), std(k1list(hatchList == 1 & matEnv == 0)), .1);
+ek02 = terrorbar(2.5, mean(paramToPlot(hatchList == 1 & matEnv == 0)), ...
+    std(paramToPlot(hatchList == 1 & matEnv == 0)), .1);
 set(ek02, 'color', 'k', 'linewidth', 2);
 
 
 set(gca, 'xtick', [0.5 1.5 2.5])
 set(gca, 'fontsize', 14);
-ylim([0 .3]);
+ylim([0 12]);
 set(gca, 'xticklabel', {'non-fert', 'fert', 'hatch'});
 ylabel('k_1 parameter');
-title('MII oocyte mechanics depend on environment');
+title('MII oocyte mechanics correlated with development');
 xlim([0 3]);
 %
 
-[p h] = ranksum(k1list(fertList == 0 & matEnv == 0), k1list(fertList == 1 & hatchList == 0 & matEnv == 0))
-[p h] = ranksum(k1list(fertList == 0 & matEnv == 0), k1list(hatchList == 1 & matEnv == 0))
-[p h] = ranksum(k1list(fertList == 1 & hatchList == 0 & matEnv == 0), k1list(hatchList == 1 & matEnv == 0))
+[p h] = ranksum(paramToPlot(fertList == 0 & matEnv == 0), paramToPlot(fertList == 1 & hatchList == 0 & matEnv == 0))
+[p h] = ranksum(paramToPlot(fertList == 0 & matEnv == 0), paramToPlot(hatchList == 1 & matEnv == 0))
+[p h] = ranksum(paramToPlot(fertList == 1 & hatchList == 0 & matEnv == 0), paramToPlot(hatchList == 1 & matEnv == 0))
 
+
+%% Bar plot k1 of in vivo matured oocytes over time
+
+
+figure(6);
+clf;
+paramToPlot = n1list;
+
+
+% 12hr
+k00 = bar(.5, mean(paramToPlot(measHourList == 12 & matEnv == 0)), .8, 'facecolor', [0 .2 .8]);
+hold on;
+ek00 = terrorbar(.5, mean(paramToPlot(measHourList == 12 & matEnv == 0)), std(paramToPlot(measHourList == 12 & matEnv == 0)), .1);
+set(ek00, 'color', 'k', 'linewidth', 2);
+
+% 16 hr
+k01 = bar(1.5, mean(paramToPlot(measHourList == 16 & hatchList == 0 & matEnv == 0)), .8, 'facecolor', [.6 .6 .6]);
+hold on;
+ek01 = terrorbar(1.5, mean(paramToPlot(measHourList == 16 & hatchList == 0 & matEnv == 0)), ...
+    std(paramToPlot(measHourList == 16 & hatchList == 0 & matEnv == 0)), .1);
+set(ek01, 'color', 'k', 'linewidth', 2);
+
+% 20 hr
+k02 = bar(2.5, mean(paramToPlot(measHourList == 20 & matEnv == 0)), .8, 'facecolor', [.8 .2 .8]);
+hold on;
+ek02 = terrorbar(2.5, mean(paramToPlot(measHourList == 20 & matEnv == 0)), ...
+    std(paramToPlot(measHourList == 20 & matEnv == 0)), .1);
+set(ek02, 'color', 'k', 'linewidth', 2);
+
+
+set(gca, 'xtick', [0.5 1.5 2.5])
+set(gca, 'fontsize', 14);
+ylim([0 12]);
+set(gca, 'xticklabel', {'12 hr', '16 hr', '20 hr'});
+ylabel('n_1 parameter');
+title('MII oocyte mechanics depend on time');
+xlim([0 3]);
+%
+
+[p h] = ranksum(paramToPlot(measHourList == 12 & matEnv == 0), paramToPlot(measHourList == 16 & matEnv == 0))
+[p h] = ranksum(paramToPlot(measHourList == 16 & matEnv == 0), paramToPlot(measHourList == 20 & matEnv == 0))
+[p h] = ranksum(paramToPlot(measHourList == 12 & matEnv == 0), paramToPlot(measHourList == 20 & matEnv == 0))
 
 
 

@@ -6,8 +6,9 @@
 %%%%%%%%%% FILL IN TYPE AND DATE HERE %%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-type = 'mouse oocyte'; % other values = "human", "mouse embryo" or "mouse oocyte"
+type = 'other'; % other values = "human", "mouse embryo" or "mouse oocyte", "other"
 currDate = '10-21-15';
+nameToSave = 'B1_loc1'; % modify this if using "other"
 dateU = currDate;
 dateUI = strfind(currDate, '-');
 dateU(dateUI) = '_';
@@ -62,13 +63,11 @@ elseif isequal(type, 'mouse embryo')
     Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
     adaptHist = 1;
-elseif isequal(type, 'custom')
+elseif isequal(type, 'other')
     % modify this as needed for experiments that don't fit standard
     % template
-%     filePath2 = ['Raw Data\Videos\Mouse Embryos\videos ', currDate, '\', ...
-%         vitStatus, 'Vit\'];
-%     filePath3 = ['Processed Data\Mouse embryo analysis\', currDate, ...
-%         ' analysis\', vitStatus, 'Vit\'];
+    % this currently doesn't work .. modify if needed
+    [fileName, pathName] = uigetfile('.avi');
     filePath2 = ['Raw Data\Videos\Mouse Oocyte\videos ', currDate, '\'];
     filePath3 = ['Processed Data\Mouse oocyte\', currDate, ...
         ' analysis\'];
@@ -77,8 +76,7 @@ elseif isequal(type, 'custom')
     cropVal = .5;
     tauStart = .03;
     pipSizeRef = 126;
-    Fin = currMult * .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
-    % 126 pixels is standard opening
+    Fin = currMult * .0867 * 6895 * pi * (10*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
 end
 
