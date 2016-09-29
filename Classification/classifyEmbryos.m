@@ -39,7 +39,7 @@ addpath('..');
 % addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection\Livia');
 % addpath('C:\Users\Livia\Desktop\SVM code\Bruce Code\MG_ImpactDetection');
 
-if isequal(method, 'human embryo')
+if isequal(method, 'human embryo') || isequal(method, 'clinical')
     filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Human\';
 elseif isequal(method, 'mouse oocyte')
     filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse Oocyte\';
@@ -54,6 +54,12 @@ AtotalPR = [];
 decDistTest = [];
 Ytotal = [];
 Ztotal = [];
+
+sensList = [];
+specList = [];
+ppvList = [];
+accList = [];
+
 AUC_ROC = [];
 AUC_PR = [];
 aROCstd = [];
@@ -78,16 +84,14 @@ for j = 1:numRepeats
     %% first load data to be used for classification
     
     if isequal(method, 'clinical')
-        [mOut, paramsOut, testIndList, enumList] = loadSVMdataClinical(inputMethod, nGroups, ...
-            paramNumsToUse);
+        [mOut, paramsOut, testIndList, enumList] = loadSVMdataClinical(inputMethod, nGroups, paramNumsToUse);
     elseif isequal(method, 'human embryo')
         saveNewMorphology('human');
         [mOut, paramsOut, testIndList, enumList] = loadSVMdataHuman(inputMethod, nGroups, 0, ...
             filePath1, paramNumsToUse);
     elseif isequal(method, 'mouse oocyte')
         saveNewMorphology('mouse oocyte');
-        [mOut, paramsOut, testIndList, enumList] = loadSVMdataOocyte(inputMethod, nGroups, 0, ...
-            filePath1, paramNumsToUse);
+        [mOut, paramsOut, testIndList, enumList] = loadSVMdataOocyte(inputMethod, nGroups, paramNumsToUse);
     else % mouse embryo
         saveNewMorphology('mouse embryo');
         [mOut, paramsOut, testIndList, enumList] = loadSVMdata(inputMethod, nGroups, 0, ...
@@ -129,10 +133,20 @@ for j = 1:numRepeats
 
         
     elseif inputMethod == 1
-                
+
+       
         % do cross-validation on data set that already has ground truth
         [~, decDistTest, ~] = classifyExisting(paramsOut, mOut, ...
             fig_handle, plotInput);
+        
+        pOut = ((sign(decDistTest+.5)+1)/2)';
+        matchOut = (mOut == pOut);
+        
+        sensList = [sensList, sum(mOut == 1 & matchOut == 1)/sum(mOut)];
+        specList = [specList, sum(mOut == 0 & matchOut == 1)/sum(1-mOut)];
+        ppvList = [ppvList, sum(pOut == 1 & mOut == 1)/sum(pOut == 1)];
+        accList = [accList, sum(matchOut)/length(mOut)];
+        
         
         %% Plot ROC curves
         
@@ -222,5 +236,10 @@ else
     aPRstd = NaN;
     
 end
+
+sensAvg = mean(sensList)
+specAvg = mean(specList)
+ppvAvg = mean(ppvList)
+accAvg = mean(accList)
 
 end

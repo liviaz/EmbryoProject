@@ -57,6 +57,8 @@ for i = startFrame:lastFrame
             framesOut(:,:,i-startFrame+1) = double(currFrame)/255;
         end
     end
+    
+%     framesOut(:,:,i-startFrame+1) = imrotate(framesOut(:,:,i-startFrame+1),-20, 'nearest', 'crop');
 end
 
 

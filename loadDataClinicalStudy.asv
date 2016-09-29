@@ -12,7 +12,7 @@ function outputStruct = loadDataClinicalStudy()
 
 outputStruct = struct;
 
-numParticipants = 29;
+numParticipants = 31;
 participantIDs = cell(1,numParticipants);
 numEmbryos = zeros(1,numParticipants);
 outcomeInfo = cell(1,numParticipants); % 
@@ -515,16 +515,13 @@ numEmbryos(31) = 18;
 outcomeInfo{31} = 2*ones(1,18);
 zygoteM{31} = NaN*ones(1,18);
 d3M{31} = {'8II', '7II', '5II', '8I', '9I', '8I', '7I', '5III', '5II',...
-           '6II', '6III', '8II', '9II', '8III', '9III', '9III', '7III', '4II'};
-blastM{31} = {'', '', '', '', '', '', '', '', '', ...
-              '', '', '', '', '', '', '', '', ''};
-ICSI{31} = zeros(1,18);
-PGD{31} = NaN*zeros(1,18);
-gender{31} = NaN*zeros(1,18);
-patientAge(31) = 32;
-patientBMI(31) = 19.0;
-
-
+            '6II};
+blastM{31} = {'3BB', '1', '3AB', '', '', '', '3BB', '', '', ''};
+ICSI{31} = zeros(1,10);
+PGD{31} = NaN*zeros(1,10);
+gender{31} = NaN*zeros(1,10);
+patientAge(31) = 33;
+patientBMI(31) = 22.8;
 
 
 outputStruct.numParticipants = numParticipants;

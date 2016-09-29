@@ -273,9 +273,9 @@ clf;
 % Group 1
 h11 = bar(.9, mean(thawDiff(groupList == 1)), .7, 'facecolor', [.8 .8 .8]);
 hold on;
-e11 = errorbar(.9, mean(thawDiff(groupList == 1)),...
-    std(thawDiff(groupList == 1)),'color', 'k', 'linewidth', 2);
-setErrorBar(e11, .9, .03);
+e11 = terrorbar(.9, mean(thawDiff(groupList == 1)),...
+    std(thawDiff(groupList == 1)), .1);
+set(e11, 'color', 'k', 'linewidth', 2);
 
 % h12 = bar(1.1, mean(postThaw(groupList == 1)), .2, 'facecolor', [.3 .3 .3]);
 % hold on;
@@ -286,9 +286,9 @@ setErrorBar(e11, .9, .03);
 % Group 2
 h21 = bar(1.9, mean(thawDiff(groupList == 2)), .7, 'facecolor', [.8 .8 .8]);
 hold on;
-e21 = errorbar(1.9, mean(thawDiff(groupList == 2)),...
-    std(thawDiff(groupList == 2)),'color', 'k', 'linewidth', 2);
-setErrorBar(e21, 1.9, .03);
+e21 = terrorbar(1.9, mean(thawDiff(groupList == 2)),...
+    std(thawDiff(groupList == 2)), .1);
+set(e21, 'color', 'k', 'linewidth', 2);
 
 % h22 = bar(2.1, mean(postThaw(groupList == 2)), .2, 'facecolor', [.3 .3 .3]);
 % hold on;
@@ -299,9 +299,9 @@ setErrorBar(e21, 1.9, .03);
 % Group 3
 h31 = bar(2.9, mean(thawDiff(groupList == 3)), .7, 'facecolor', [.8 .8 .8]);
 hold on;
-e31 = errorbar(2.9, mean(thawDiff(groupList == 3)),...
-    std(thawDiff(groupList == 3)),'color', 'k', 'linewidth', 2);
-setErrorBar(e31, 2.9, .03);
+e31 = terrorbar(2.9, mean(thawDiff(groupList == 3)),...
+    std(thawDiff(groupList == 3)), .1);
+set(e31, 'color', 'k', 'linewidth', 2);
 
 % h32 = bar(3.1, mean(postThaw(groupList == 3)), .2, 'facecolor', [.3 .3 .3]);
 % hold on;
@@ -312,9 +312,9 @@ setErrorBar(e31, 2.9, .03);
 % Group 4
 h41 = bar(3.9, mean(thawDiff(groupList == 4)), .7, 'facecolor', [.8 .8 .8]);
 hold on;
-e41 = errorbar(3.9, mean(thawDiff(groupList == 4)),...
-    std(thawDiff(groupList == 4)),'color', 'k', 'linewidth', 2);
-setErrorBar(e41, 3.9, .03);
+e41 = terrorbar(3.9, mean(thawDiff(groupList == 4)),...
+    std(thawDiff(groupList == 4)), .1);
+set(e41, 'color', 'k', 'linewidth', 2);
 
 % h42 = bar(4.1, mean(postThaw(groupList == 4)), .2, 'facecolor', [.3 .3 .3]);
 % hold on;
@@ -380,53 +380,53 @@ clf;
 % time 2
 h22 = bar(1.9, mean(timeData(timeGroup == 2,2)), .2, 'facecolor', [.3 .3 .3]);
 hold on;
-e22 = errorbar(1.9, mean(timeData(timeGroup == 2,2)),...
-    std(timeData(timeGroup == 2,2)),'color', 'k', 'linewidth', 2);
-setErrorBar(e22, 1.9, .03);
+e22 = terrorbar(1.9, mean(timeData(timeGroup == 2,2)),...
+    std(timeData(timeGroup == 2,2)), .1);
+set(e22, 'color', 'k', 'linewidth', 2);
 
 h24 = bar(2.1, mean(timeData(timeGroup == 4,2)), .2, 'facecolor', [.6 .6 .6]);
 hold on;
-e24 = errorbar(2.1, mean(timeData(timeGroup == 4,2)),...
-    std(timeData(timeGroup == 4,2)),'color', 'k', 'linewidth', 2);
-setErrorBar(e24, 2.1, .03);
+e24 = terrorbar(2.1, mean(timeData(timeGroup == 4,2)),...
+    std(timeData(timeGroup == 4,2)), .1);
+set(e24, 'color', 'k', 'linewidth', 2);
 
 % time 3
 h32 = bar(2.9, mean(timeData(timeGroup == 2,3)), .2, 'facecolor', [.3 .3 .3]);
 hold on;
-e32 = errorbar(2.9, mean(timeData(timeGroup == 2,3)),...
-    std(timeData(timeGroup == 2,3)),'color', 'k', 'linewidth', 2);
-setErrorBar(e32, 2.9, .03);
+e32 = terrorbar(2.9, mean(timeData(timeGroup == 2,3)),...
+    std(timeData(timeGroup == 2,3)), .1);
+set(e32, 'color', 'k', 'linewidth', 2);
 
 h34 = bar(3.1, mean(timeData(timeGroup == 4,3)), .2, 'facecolor', [.6 .6 .6]);
 hold on;
-e34 = errorbar(3.1, mean(timeData(timeGroup == 4,3)),...
-    std(timeData(timeGroup == 4,3)),'color', 'k', 'linewidth', 2);
-setErrorBar(e34, 3.1, .03);
+e34 = terrorbar(3.1, mean(timeData(timeGroup == 4,3)),...
+    std(timeData(timeGroup == 4,3)), .1);
+set(e34, 'color', 'k', 'linewidth', 2);
 
 % time 4
 h42 = bar(3.9, mean(timeData(timeGroup == 2,4)), .2, 'facecolor', [.3 .3 .3]);
 hold on;
-e42 = errorbar(3.9, mean(timeData(timeGroup == 2,4)),...
-    std(timeData(timeGroup == 2,4)),'color', 'k', 'linewidth', 2);
-setErrorBar(e42, 3.9, .03);
+e42 = terrorbar(3.9, mean(timeData(timeGroup == 2,4)),...
+    std(timeData(timeGroup == 2,4)), .1);
+set(e42, 'color', 'k', 'linewidth', 2);
 
 h44 = bar(4.1, mean(timeData(timeGroup == 4,4)), .2, 'facecolor', [.6 .6 .6]);
 hold on;
-e44 = errorbar(4.1, mean(timeData(timeGroup == 4,4)),...
-    std(timeData(timeGroup == 4,4)),'color', 'k', 'linewidth', 2);
-setErrorBar(e44, 4.1, .03);
+e44 = terrorbar(4.1, mean(timeData(timeGroup == 4,4)),...
+    std(timeData(timeGroup == 4,4)), .1);
+set(e44, 'color', 'k', 'linewidth', 2);
 
 h41 = bar(3.7, mean(thawDiff(groupList == 1)), .2, 'facecolor', [.1 .1 .1]);
 hold on;
-e41 = errorbar(3.7, mean(thawDiff(groupList == 1)),...
-    std(thawDiff(groupList == 1)),'color', 'k', 'linewidth', 2);
-setErrorBar(e41, 3.7, .03);
+e41 = terrorbar(3.7, mean(thawDiff(groupList == 1)),...
+    std(thawDiff(groupList == 1)), .1);
+set(e41, 'color', 'k', 'linewidth', 2);
 
 h43 = bar(4.3, mean(thawDiff(groupList == 3)), .2, 'facecolor', [.9 .9 .9]);
 hold on;
-e43 = errorbar(4.3, mean(thawDiff(groupList == 3)),...
-    std(thawDiff(groupList == 3)),'color', 'k', 'linewidth', 2);
-setErrorBar(e43, 4.3, .03);
+e43 = terrorbar(4.3, mean(thawDiff(groupList == 3)),...
+    std(thawDiff(groupList == 3)), .1);
+set(e43, 'color', 'k', 'linewidth', 2);
 
 plot([1 5], mean(thawDiff(groupList == 1))*ones(1,2), '--k', 'linewidth', 2);
 
@@ -454,31 +454,31 @@ clf;
 % 30 min, control group
 h1c = bar(1.9, mean(timeData(timeGroup == 2,2)), .2, 'facecolor', [.1 .1 .1]);
 hold on;
-e1c = errorbar(1.9, mean(timeData(timeGroup == 2,2)),...
-    std(timeData(timeGroup == 2,2)),'color', 'k', 'linewidth', 2);
-setErrorBar(e1c, 1.9, .03);
+e1c = terrorbar(1.9, mean(timeData(timeGroup == 2,2)),...
+    std(timeData(timeGroup == 2,2)), .1);
+set(e1c, 'color', 'k', 'linewidth', 2);
 
 
 % 30 min, meas group
 h1m = bar(2.1, mean(timeData(timeGroup == 4,2)), .2, 'facecolor', [.7 .7 .7]);
 hold on;
-e1m = errorbar(2.1, mean(timeData(timeGroup == 4,2)),...
-    std(timeData(timeGroup == 4,2)),'color', 'k', 'linewidth', 2);
-setErrorBar(e1m, 2.1, .03);
+e1m = terrorbar(2.1, mean(timeData(timeGroup == 4,2)),...
+    std(timeData(timeGroup == 4,2)), .1);
+set(e1m, 'color', 'k', 'linewidth', 2);
 
 % 3 hr, control group
 h2c = bar(2.9, mean(thawDiff(groupList == 1)), .2, 'facecolor', [.1 .1 .1]);
 hold on;
-e2c = errorbar(2.9, mean(thawDiff(groupList == 1)),...
-    std(thawDiff(groupList == 1)),'color', 'k', 'linewidth', 2);
-setErrorBar(e2c, 2.9, .03);
+e2c = terrorbar(2.9, mean(thawDiff(groupList == 1)),...
+    std(thawDiff(groupList == 1)), .1);
+set(e2c, 'color', 'k', 'linewidth', 2);
 
 % 3 hr, meas group
 h2m = bar(3.1, mean(thawDiff(groupList == 3)), .2, 'facecolor', [.7 .7 .7]);
 hold on;
-e2m = errorbar(3.1, mean(thawDiff(groupList == 3)),...
-    std(thawDiff(groupList == 3)),'color', 'k', 'linewidth', 2);
-setErrorBar(e2m, 3.1, .03);
+e2m = terrorbar(3.1, mean(thawDiff(groupList == 3)),...
+    std(thawDiff(groupList == 3)), .1);
+set(e2m, 'color', 'k', 'linewidth', 2);
 
 set(gca, 'xtick', [2 3])
 set(gca, 'fontsize', 14);

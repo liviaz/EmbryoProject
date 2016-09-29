@@ -80,7 +80,7 @@ for i = 1:numParticipants
                 participantIDs{i} '_E' num2str(j) '.mat'];
             
             % save embryo params and color
-            if exist(currDataPath, 'file') && (ICSI{i}(j) == 0)
+            if exist(currDataPath, 'file') && (ICSI{i}(j) == 1)
                 load(currDataPath);
                 mList = [mList outcomeInfo{i}(j)];
                 k0list = [k0list k0];
@@ -100,6 +100,7 @@ for i = 1:numParticipants
                 if numel(dayThreeM) == 0
                     dayThreeM1 = [dayThreeM1 NaN];
                     dayThreeM2 = [dayThreeM2 NaN];
+                    k1list(end) = NaN;
                 else
                     dayThreeM1 = [dayThreeM1 str2num(dayThreeM(1))];
                     dayThreeM2 = [dayThreeM2 getNumFromNumeral(dayThreeM(2:end))];
@@ -107,6 +108,7 @@ for i = 1:numParticipants
                 
                 if isnan(outcomeInfo{i}(j))% || (ICSI{i}(j) == 1)
                     mList(end) = NaN;
+                    k1list(end) = NaN;
                     colorMat = [colorMat; [NaN NaN NaN]];
                 elseif outcomeInfo{i}(j)
                     colorMat = [colorMat; [0 .6 0]];
@@ -136,7 +138,7 @@ end
 
 zList = zList + .3*randn(1,length(zList)); % add a little random noise to morphology
 numsToPlot = ~isnan(k1list) & ~isnan(n1list) & ~isnan(taulist) & ...
-        ~isnan(mList);
+        ~isnan(mList) & ~isnan(dayThreeM1);
 
 if inputMethod == 2
     numToTest = length(mList(mList == 5));
@@ -171,7 +173,7 @@ aa = (a - aMin) ./ (aMax - aMin);
 % Scale data first
 % normalize all params 0-1
 m = mList(numsToPlot);
-paramsOut = [kk ; nn ; tt ; kk2; aa']'; %aa
+paramsOut = [kk ; nn ; tt ; kk2; mm1; mm2; aa']'; %aa
 paramsOut = paramsOut(:,paramNumsToUse);
 paramsOut = [paramsOut];%, zz'];
 mOut = m;

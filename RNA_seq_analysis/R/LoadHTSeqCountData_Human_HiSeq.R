@@ -2,7 +2,7 @@
 
 source("http://bioconductor.org/biocLite.R")
 library(Rsamtools)
-#library(DESeq2)
+library(DESeq)
 library(edgeR)
 library(sva)
 library(ALL)
@@ -11,6 +11,7 @@ library(GO.db)
 library(Homo.sapiens)
 library(goseq)
 library(rtracklayer)
+library(GenomicRanges)
 library(ape)
 library(rgl)
 library(reshape2)
@@ -24,11 +25,11 @@ library(matrixStats)
 library(clValid)
 
 if (Sys.info()["sysname"] == "Linux") {
-  source("/host/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "/host/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/countData"
+  source("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/UsefulFunctions.R")
+  baseDataDirectory <- "/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/HTSeq_Count_Out"
 } else {
-  source("C:/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/UsefulFunctions.R")
-  baseDataDirectory <- "C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/countData"
+  source("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/UsefulFunctions.R")
+  baseDataDirectory <- "C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/HTSeq_Count_Out"
 }
 
 
@@ -97,8 +98,19 @@ exptDesign <- data.frame(row.names = colnames(allCounts),
                          condition = c("bad1", "good1", "bad1", "bad1", "bad1", "good1", "bad1", "good1", "good1", "bad1", "bad2", "bad2", "bad2", "bad2", 
                                        "bad2", "bad2", "good2", "good2", "good2", "good2", "good2", "bad2"), 
                          libType = c(rep("pe", 22)))
-
-
 condition = exptDesign$condition
+
+
+# assemble count data set
+conditionAll = c("bad", "good", "bad", "bad", "bad", "good", "good", "good", "good", "bad", "bad", "bad", "bad", "bad", 
+                 "good", "bad", "good", "good", "good", "good", "good", "bad")
+
+conditionDiff = c("bad1", "good1", "bad1", "bad1", "bad1", "good1", "good1", "good1", "good1", "bad1", "bad2", "bad2", "bad2", "bad2", 
+                  "good2", "bad2", "good2", "good2", "good2", "good2", "good2", "bad2")
+decDist = c(4.36, 0.7, 2.09, 3.19, 3.38, 1.08, 1.63, 0.50, 1.12, 3.90, 6.31, 4.04, 4.63, 2.87, 1.72, 2.55, 1.07, 0.94, 1.08, 1.46, 1.82, 2.57)
+embryosSamePatient = c(3,4,6,7,8,10,11,12,13,14,15,16,17,18,20,21,22)
 exptNum = c(1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2)
-allCountsOriginal = allCounts
+includePatient = c(FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE)
+
+
+

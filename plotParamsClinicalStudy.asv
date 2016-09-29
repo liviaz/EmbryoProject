@@ -56,7 +56,7 @@ for i = 1:numParticipants
             ptList = [ptList i];
 
             % save embryo params and color
-            if exist(currDataPath, 'file')  && (ICSI{i}(j) == 0) 
+            if exist(currDataPath, 'file')%  && (ICSI{i}(j) == 1) 
                 load(currDataPath);
                 mList = [mList outcomeInfo{i}(j)>0];
                 k0list = [k0list k0];
@@ -448,7 +448,7 @@ mAll = mList(~isnan(mList) & ~isnan(k1list) & valInRange);
 
 nPoints = 10;
 minDist = 0.1;
-scalingFactor = 100;
+scalingFactor = 20;
 blastGrid = zeros(length(xVals)-1, length(yVals)-1);
 
 % make color mat
@@ -490,19 +490,21 @@ for i = 1:size(blastGrid,1)
 %         blastGrid(i,j) = meanViability;
 
         % gaussian kernel regression
-        mScale = mAll*2 - 1;
-        
-        % weighted sum based on distance
-        meanViability = sum(mAll .* exp(-1*(distAll.^2)*scalingFactor) ./...
-            repmat(sum(exp(-1*(distAll.^2)*scalingFactor)), 1, length(mAll)));
-        
-        blastGrid(i,j) = meanViability;
-        currColor = minColor*(1-meanViability) + maxColor*meanViability;
-        
-        xPatch = [xVals(i) xVals(i+1) xVals(i+1) xVals(i) xVals(i)];
-        yPatch = [yVals(j) yVals(j) yVals(j+1) yVals(j+1) yVals(j)];
-        h = patch('xdata', xPatch, 'ydata', yPatch, 'edgecolor', currColor/2, ...
-            'facecolor', currColor, 'facealpha', .8, 'edgealpha', .2);
+        if (min(distAll) < minDist)
+            mScale = mAll*2 - 1;
+            
+            % weighted sum based on distance
+            meanViability = sum(mAll .* exp(-1*(distAll.^2)*scalingFactor) ./...
+                repmat(sum(exp(-1*(distAll.^2)*scalingFactor)), 1, length(mAll)));
+            
+            blastGrid(i,j) = meanViability;
+%             currColor = minColor*(1-meanViability) + maxColor*meanViability;
+            
+%             xPatch = [xVals(i) xVals(i+1) xVals(i+1) xVals(i) xVals(i)];
+%             yPatch = [yVals(j) yVals(j) yVals(j+1) yVals(j+1) yVals(j)];
+%             h = patch('xdata', xPatch, 'ydata', yPatch, 'edgecolor', currColor/2, ...
+%                 'facecolor', currColor, 'facealpha', .8, 'edgealpha', .2);
+        end
 
          
         

@@ -54,6 +54,12 @@ set(hline2, 'linewidth', 1)
 set(hline1, 'linewidth', 1)
 legend('Measured Depth', 'Fit to Model', 'Applied Pressure', 'Location', 'SouthEast')
 
+
+
+
+
+
+
 %% 2B : Aspiration depth curves for mouse embryos
 
 
@@ -188,37 +194,26 @@ goodIndividual = [ones(1,9) zeros(1,5) ones(1,8) zeros(1,4) ones(1,10) zeros(1,4
 controlIndividual = [ones(1,6) zeros(1,8) ones(1,7) zeros(1,5) ones(1,6) zeros(1,8) ones(1,7) zeros(1,8)];
 badIndividual = [ones(1,3) zeros(1,11) ones(1,2) zeros(1,10) ones(1,2) zeros(1,12) ones(1,6) zeros(1,9)];
 
-x1 = [repmat('v', length(goodIndividual),1); ...
-     repmat('n', length(badIndividual),1)];
-x2 = [ones(sum(goodIndividual),1); zeros(55 - sum(goodIndividual), 1); ...
-    ones(sum(badIndividual),1); zeros(55 - sum(badIndividual), 1)];
+x1 = [repmat('v', length(badIndividual),1); ...
+     repmat('n', length(controlIndividual),1)];
+x2 = [ones(sum(badIndividual),1); zeros(55 - sum(badIndividual), 1); ...
+    ones(sum(controlIndividual),1); zeros(55 - sum(controlIndividual), 1)];
 [tbl,chi2stat,pval] = crosstab(x1, x2)
 
 figure;
-h1 = bar(1, mean(badPercentage), 'facecolor', [0 0 .6]);
+h1 = bar(1, mean(badPercentage), 'facecolor', [.85 .65 .2]);
 hold on;
-e1 = errorbar(1,mean(badPercentage),std(badPercentage),'color', 'k', 'linewidth', 2);
+e1 = terrorbar(1,mean(badPercentage),std(badPercentage),.1);
+set(e1,'color', 'k', 'linewidth', 2);
 
-% make width same size as p3e
-h1 = get(e1, 'children');
-x1 = get(h1, 'xdata');
-x1(2) = {[1 1 NaN 0.97 1.03 NaN 0.97 1.03 NaN]};
-set(h1(2), 'xdata', x1{2});
-set(e1, 'children', h1);
-
-h2 = bar(2, mean(controlPercentage), 'facecolor', [0 .6 .6]);
-e2 = errorbar(2,mean(controlPercentage),std(controlPercentage),'color', 'k', 'linewidth', 2);
-
-% make width same size as p3e
-h2 = get(e2, 'children');
-x2 = get(h2, 'xdata');
-x2(2) = {[2 2 NaN 1.97 2.03 NaN 1.97 2.03 NaN]};
-set(h2(2), 'xdata', x2{2});
-set(e2, 'children', h2);
+h2 = bar(2, mean(controlPercentage), 'facecolor', [.6 .6 .6]);
+e2 = terrorbar(2,mean(controlPercentage),std(controlPercentage),.1);
+set(e2,'color', 'k', 'linewidth', 2);
 
 
-h3 = bar(3, mean(goodPercentage), 'facecolor', [0 .6 0]);
-e3 = errorbar(3,mean(goodPercentage),std(goodPercentage),'color', 'k', 'linewidth', 2);
+h3 = bar(3, mean(goodPercentage), 'facecolor', [.2 .6 .9]);
+e3 = terrorbar(3,mean(goodPercentage),std(goodPercentage),.1);
+set(e3,'color', 'k', 'linewidth', 2);
 
 
 set(gca, 'xtick', [1 2 3])
@@ -495,26 +490,15 @@ testSE = 196*sqrt((197/282)*(85/282)/282); % 95% CI
 figure;
 h1 = bar(1, mean(controlV), 'facecolor', [.5 .5 .5]);
 hold on;
-e1 = errorbar(1,mean(controlV),2*controlSE, ...
-    'color', 'k', 'linewidth', 2);
+e1 = terrorbar(1, mean(controlV), 2*controlSE, .1);
+set(e1, 'color', 'k', 'linewidth', 2);
 
-% make width same size as p3e
-h1 = get(e1, 'children');
-x1 = get(h1, 'xdata');
-x1(2) = {[1 1 NaN 0.97 1.03 NaN 0.97 1.03 NaN]};
-set(h1(2), 'xdata', x1{2});
-set(e1, 'children', h1);
 
 h2 = bar(2, mean(testV), 'facecolor', [.5 .5 .5]);
-e2 = errorbar(2,mean(testV),2*testSE, ...
-    'color', 'k', 'linewidth', 2);
+e2 = terrorbar(2,mean(testV),2*testSE, .1);
+set(e2, 'color', 'k', 'linewidth', 2);
 
-% make width same size as p3e
-h2 = get(e2, 'children');
-x2 = get(h2, 'xdata');
-x2(2) = {[2 2 NaN 1.97 2.03 NaN 1.97 2.03 NaN]};
-set(h2(2), 'xdata', x2{2});
-set(e2, 'children', h2);
+
 
 set(gca, 'xtick', [1 2])
 set(gca, 'fontsize', 14);

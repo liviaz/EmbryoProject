@@ -73,7 +73,7 @@ for kk = 1:length(tauTryList)
     fValList = [fValList fval];
 end
 
-if(isfield(handles, 'PlotAxes')
+if(isfield(handles, 'PlotAxes'))
     axes(handles.PlotAxes);
     cla;
 end

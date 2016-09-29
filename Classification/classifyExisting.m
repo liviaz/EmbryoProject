@@ -11,7 +11,7 @@ function [predictOut, decDistOut, fig_handle] = classifyExisting(params, m, fig_
 % train SVM classifier with 10-fold cross-validation
 % make predictions and return decision boundary distances
 
-bestSigma = .2; % findBestSVMParams(params, m);
+bestSigma = .7; % findBestSVMParams(params, m);
 
 embryoClassifier = fitcsvm(params, m, 'ResponseName', 'Viability', ...
     'KernelFunction', 'rbf', 'Standardize', true, 'CrossVal', 'on');%, 'KernelScale', bestSigma);

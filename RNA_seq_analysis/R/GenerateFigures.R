@@ -4,9 +4,19 @@ rm(list = ls())
 
 
 if (Sys.info()["sysname"] == "Linux") {
-  source("/host/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/LoadHTSeqCountData_Human_HiSeq.R")
+  source("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/LoadHTSeqCountData_Human_HiSeq.R")
+  # read in RPKM data
+  conditionCombined = c(condition, 5,5,5)
+  allRPKM = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/allHumanEmbryoRPKM.txt")
+  #yanData = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/Yan2013.csv", header = TRUE, row.names = 1)
+  combinedRPKMtable = read.table("/host/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/combinedEmbryoRPKM.txt")
 } else {
-  source("C:/Users/Livia/Desktop/IVF/Code/EmbryoProject/RNA_seq_analysis/R/LoadHTSeqCountData_Human_HiSeq.R")
+  source("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/Scripts/R/LoadHTSeqCountData_Human_HiSeq.R")
+  # read in RPKM data
+  conditionCombined = c(condition, 5,5,5)
+  allRPKM = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/allHumanEmbryoRPKM.txt")
+  #yanData = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/Yan2013.csv", header = TRUE, row.names = 1)
+  combinedRPKMtable = read.table("C:/Users/Livia/Desktop/IVF/RnaSeqAnalysis/RawData/HumanHiSeq/combinedEmbryoRPKM.txt")
 }
 
 
@@ -18,8 +28,8 @@ n1 = c(.9846, .6002, .2841, .9604, .9848, .5634, .6229, .5988, .5586, .5216, 1.5
 embryosSamePatient = c(3,4,6,7,8,10,11,12,13,14,15,16,17,18,20,21,22)
 
 
-combat.edata = read.table(paste(baseDataDirectory, "/adjusted_expression_data.txt", sep = ""))
-DEnames.qvals = read.table(paste(baseDataDirectory, "/adjusted_expression_qvals.txt", sep = ""))
+combat.edata = read.table(paste(baseDataDirectory, "/edgeR/ComBat_SVA/combat_edata.txt", sep = ""))
+DEnames.qvals = read.table(paste(baseDataDirectory, "/edgeR/ComBat_SVA/DEnames_qvals.txt", sep = ""))
 qValuesComBat = DEnames.qvals[,1]
 names(qValuesComBat) = row.names(DEnames.qvals)
 DEnames.qvals = qValuesComBat
@@ -27,9 +37,10 @@ logFC = rowMeans(combat.edata[,conditionAll[embryosSamePatient] == "good"]) -
   rowMeans(combat.edata[,conditionAll[embryosSamePatient] == "bad"])
 
 # re-plot phylo
-names(combat.edata) = c("E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "E10", "E11", "E12", "E13", "E14", "E15", "E16", "E17")
 hmcol = c("#009b00", "#009b00", "#00009b", "#00009b", "#00009b", "#00009b", "#00009b")
 hc = hclust(dist(t(combat.edata)))
+# hc = hclust(dist(t(log2(cpm(yDiff)+1))))
+#plot(as.phylo(hc), tip.color=hmcol[lane-1])
 plot(as.phylo(hc), tip.color=hmcol[ceiling(decDist[embryosSamePatient])])
 
 
@@ -65,13 +76,10 @@ ggplot(dataToPlot, aes(expr,k1, color=embryoViability)) +
 #             row.names = FALSE, quote = FALSE, col.names = FALSE)
 
 
-
-
-
-
-
-######################################
-# Plot log fold change box and scatter plots for selected genes
+###################################################################### 
+# Plot log fold change box and scatter plots for selected genes      #
+# Subplots for Figure 3D, and Figure 4A in paper #####################
+###################################################################### 
 
 # cell cycle (meiosis, mitosis, chromosome segregation)
 genesToPlot = c("MAD2L1", "BUB1", "CDC25B", "SYCP3", "ANAPC4", "KIF2C", "CIT", "SKA1", "POGZ", "PHF13",  
@@ -127,7 +135,7 @@ ggplot(as.data.frame(dataToPlot)) +
  #      legend.background = element_rect(colour = 'black'), legend.justification = c(0,1)) +
   xlab(NULL) +
   ylab("Log-fold-change") +
-  ylim(-1.5, 1.5) +
+  ylim(-2, 2) +
   ggtitle("Genes Important for Fertilization") +
   scale_colour_manual(values = c("#00009b", "#009b00")) +
   scale_fill_manual(values = c("#00009b", "#009b00"))
@@ -161,18 +169,20 @@ write.table(namesEntrez, file = paste(baseDataDirectory, "/edgeR/Cytoscape/names
 
 
 #########################################
+# Figure 2D 
+#########################################
 
 embryoMech = as.data.frame(t(read.table("C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/embryoMechanics/humanEmbryoParams.txt")))
 embryoDecDist = as.data.frame(t(read.table("C:/Users/Livia/Dropbox/Embryo Mechanics outline shared/Data/embryoMechanics/humanEmbryoDecDist.txt")))
-names(embryoMech) = c("mN", "k1N", "n1N", "k0N" , "tN")
+names(embryoMech) = c("mN", "k1N", "n1N", "k0N")
 names(embryoDecDist) = "decDist"
 row.names(embryoMech) = 1:89
 row.names(embryoDecDist) = 1:89
-#embryoMech = cbind(embryoMech, embryoDecDist)
+embryoMech = cbind(embryoMech, embryoDecDist)
 
-embryoMech = embryoMech[,c("mN", "k1N", "n1N", "k0N")]# , "decDist")] # take out tN
+embryoMech = embryoMech[,c("mN", "k1N", "n1N", "k0N")]#, "decDist")] # take out tN
 embryoMech[,c("k1N", "n1N", "k0N")] = log(embryoMech[,c("k1N", "n1N", "k0N")]) # take log scale for n1 and k0
-
+# 
 colMeanVars = matrix(rep(apply(embryoMech[embryoMech[,"mN"] == 4,][,c("k1N", "n1N", "k0N")], 2, median), each = 89), nrow = 89)
 embryoMech[,c("k1N", "n1N", "k0N")] = embryoMech[,c("k1N", "n1N", "k0N")] - colMeanVars # subtract avg good embryo
 

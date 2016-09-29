@@ -1,21 +1,22 @@
-% parameter extraction for blast measurements
-% based off depthDetectionAuto.m but customized for blast meas
+% parameter extraction for human oocyte measurements
+% based off depthDetectionAuto.m but more generalized
 % no pressure file saved in clinical system, video only so relies on known
 % pressure
 
 % Livia Zarnescu Yanez
-% 6-25-16
+% 7-5-16
 
-nameToSave = 'B2_loc3'; 
-manualPip = 1; % detect pipette edge based off its corner or not
-manualCorner = 1; % manually select ROI
+nameToSave = 'E1_GV'; 
+manualPip = 0; % detect pipette edge based off its corner or not
+manualCorner = 0; % manually select ROI
 manualMeasure = 0;
 
 addpath('C:\Users\Livia\Desktop\IVF\Code\EmbryoProject');
 addpath('C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\functions');
-addpath('C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\BlastMeasurements');
+addpath('C:\Users\Livia\Desktop\IVF\Code\EmbryoProject\OocyteStudies');
 
-cd('C:/Users/Livia/Desktop/IVF/Raw Data/BlastMeasurements/');
+basePath = 'C:/Users/Livia/Desktop/IVF/Raw Data/Videos/Human/HumanOocyteMeas';
+cd(basePath);
 [fileName, pathName] = uigetfile('*.avi');
 pipSize = 30; % total pipette diameter
 pressureApplied = .1;
@@ -30,7 +31,7 @@ secsToGet = -1;
 startFrame = 25;
 [newframes, frameRate] = ReadInVideo([pathName fileName], secsToGet, startFrame, 1, 0);
 currFrame = round(frameStartMult*frameRate);
-newframes = newframes(:,:,1:(frameMult*frameRate));
+newframes = newframes(:,:,1:round(frameMult*frameRate));
 
 % get pipette ROI
 % make new pipette reference if one does not already exist
@@ -122,7 +123,8 @@ start_params(3) = tauTryList(fValList == min(fValList));
 fval
 [k1 n1 tau k0]
 
-save([pathName nameToSave '.mat'], 'xfine', 'yfit', ...
+
+save([basePath '/MeasuredData/' nameToSave '.mat'], 'xfine', 'yfit', ...
         'k0', 'k1', 'n0', 'n1', 'tau', 'F0', 'fval', 't', ...
         'aspiration_depth', 'A', 'offsetVal');
 

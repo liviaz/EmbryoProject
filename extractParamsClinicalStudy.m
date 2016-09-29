@@ -2,14 +2,17 @@
 % Livia Zarnescu Yanez 11-10-15
 %
 
+clear all;
+warning off;
 close all;
-pNum = '022';
-date = '4-4-16';
+pNum = '019';
+date = '3-26-16';
 embryoNum = '5';
 
-manualPip = 1;
+manualPip = 0;
 manualCorner = 0;
 manualMeasure = 0;
+pressureUsed = 0.4;
 filePath = 'C:\Users\Livia\Desktop\IVF\';
 
 filePathRaw = [filePath 'Raw Data\Videos\Human\MECH' pNum];
@@ -29,12 +32,12 @@ movpath = [filePathRaw '\MECH' pNum '-E' embryoNum '.avi'];
 convFactor = 2.27; % pixels / micron on clinical system
 cropVal = 1; % maximum num seconds to fit to model
 secsToGet = 1.2;
-startFrame = 25;
+startFrame = 28;
 cannyThresh = .08;
 pixelSag = 20;
 
 % read in video
-[newframes, frameRate] = ReadInVideo(movpath, secsToGet, startFrame, 1);
+[newframes, frameRate] = ReadInVideo(movpath, secsToGet, startFrame, 1, 1);
 
 % get pipette ROI
 % make new pipette reference if one does not already exist
@@ -53,7 +56,7 @@ t = 0:(1/frameRate):((size(ROIframes,3)-1)/frameRate);
 clear newframes;
 
 % make pipette size reference, convert opening size to microns
-Fin = .347 * 6895 * pi * ((pipRefOpeningPixels/(convFactor*2))*10^-6)^2; % pressure*area,
+Fin = pressureUsed * 0.87 * 6895 * pi * ((pipRefOpeningPixels/(convFactor*2))*10^-6)^2; % pressure*area,
 
 % measure parameters
 if manualMeasure
@@ -78,10 +81,10 @@ end
 % aspiration_depth is in PIXELS
 close all;
 t = t(t < cropVal);
-aspiration_depth = aspiration_depth(1:length(t)) - pixelSag;
+aspiration_depth = aspiration_depth(1:length(t));
 aspiration_depth = aspiration_depth(aspiration_depth > 0);
 t = t(1:length(aspiration_depth));
-A = aspiration_depth * 10^-6 / convFactor; % convert from pixels to meters
+A = (aspiration_depth - pixelSag) * 10^-6 / convFactor; % convert from pixels to meters
 
 figure(5);
 clf;
