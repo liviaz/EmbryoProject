@@ -9,7 +9,7 @@
 type = 'mouse oocyte'; % other values = "human", "mouse embryo" or "mouse oocyte", "other"
 currDate = '1-13-16';
 embryoNum = '1';
-pressureApplied = .2; % psi
+pressureApplied = 
 
 nameToSave = 'B1_loc1'; % modify this if using "other"
 dateU = currDate;
@@ -39,7 +39,7 @@ if isequal(type, 'human')
     cropVal = 1;
     tauStart = .06;
     pipSizeRef = 229;
-    Fin = pressureApplied * .86 * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
+    Fin = .347 * 6895 * pi * (35*pipSize/pipSizeRef*10^-6)^2; % pressure*area, 
     % 229 pixels is standard pipette opening
     adaptHist = 0;
 elseif isequal(type, 'mouse oocyte')
@@ -51,7 +51,7 @@ elseif isequal(type, 'mouse oocyte')
     cropVal = .5;
     tauStart = .03;
     pipSizeRef = 126;
-    Fin = pressureApplied * .86 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = .167 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
 elseif isequal(type, 'mouse embryo')
     filePath2 = ['Raw Data\Videos\Mouse Embryo\videos ', currDate, '\'];
@@ -62,7 +62,7 @@ elseif isequal(type, 'mouse embryo')
     cropVal = .5;
     tauStart = .03;
     pipSizeRef = 126;
-    Fin = pressureApplied * .86 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = .347 * 6895 * pi * (20*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     % 126 pixels is standard opening
     adaptHist = 1;
 elseif isequal(type, 'other')
@@ -78,7 +78,7 @@ elseif isequal(type, 'other')
     cropVal = .5;
     tauStart = .03;
     pipSizeRef = 126;
-    Fin = pressureApplied * .86 * 6895 * pi * (10*pipSize/pipSizeRef*10^-6)^2; % pressure*area
+    Fin = currMult * .0867 * 6895 * pi * (10*pipSize/pipSizeRef*10^-6)^2; % pressure*area
     adaptHist = 1;
 end
 

@@ -250,6 +250,9 @@ k0N = k0list(numsToPlot);
 eN = elonglist(numsToPlot);
 n0N = n0list(numsToPlot);
 
+cN = colorMat(numsToPlot,:);
+cI = colorIdx(numsToPlot);
+
 tLN = timeLapseOut(numsToPlot,:);
 T1 = tLN(:,1);
 T2 = tLN(:,2);
@@ -291,6 +294,68 @@ dx = -0.001; dy = 0.015; dz = .008; % displacement so the text does not overlay 
 hold on;
 
 % aAll(mList == mVal)'
+
+%% patch plot
+
+figure(2);
+clf;
+hold on;
+theta = 0:0.1:(2*pi);
+colorList = [[.85 .65 .2];[.2 .6 .9]];
+
+for i = 1:length(k1N)
+    if mN(i) < 5
+        
+        xPatch = cos(theta)/120 + k1N(i);
+        yPatch = sin(theta)/30 + n1N(i);
+        patch('xdata', xPatch, 'ydata', yPatch, 'edgecolor', colorList(cI(i),:)/2, ...
+            'facecolor', colorList(cI(i),:), 'facealpha', .6, 'edgealpha', .9);
+
+%             [xPatch, yPatch, zPatch] = sphere(10);
+%             xPatch = xPatch/40 + p1(i);
+%             yPatch = yPatch/20 + p2(i);
+%             zPatch = zPatch/2 + p3(i);
+%             currPoint = surf2patch(xPatch, yPatch, zPatch);
+
+%             h = patch(currPoint, 'edgecolor', colorMat(i,:)/2, ...
+%                 'facecolor', colorMat(i,:), 'facealpha', faceAlpha, 'edgealpha', .1);
+%         
+        hold on;        
+
+    end
+end
+
+grid on;
+% set(gca, 'yscale', 'log')
+xlabel('k1 parameter');
+ylabel('n1 parameter');
+
+%% 6. SVM figure plot
+
+% figure(1);
+% clf;
+% h = scatter(p1,p2,200,colorMat,'linewidth',4);
+hold on;
+
+axisLims = [.2 .45 .2 1.1];
+embryoClassifier = fitcsvm([k1N; n1N]', cI == 2, 'ResponseName', ...
+    'Viability', 'KernelFunction', 'rbf', 'KernelScale', .8, 'standardize', true);
+[x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
+    linspace(axisLims(3),axisLims(4),100));
+xGrid = [x1Grid(:),x2Grid(:)];
+[~,scores] = predict(embryoClassifier,xGrid);
+[c, hh] = contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),-.1*[1 1],'k', 'linewidth', 2);
+
+axis(axisLims);
+
+% set(h, 'Marker', 'o');
+% set(gca, 'FontSize', 14);
+xlabel('k1 parameter');
+ylabel('n1 parameter');
+title('');
+grid on;
+axis(axisLims);
+
 
 
 %% ======== MAKE LEGEND =========

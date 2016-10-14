@@ -12,7 +12,7 @@ function outputStruct = loadDataClinicalStudy()
 
 outputStruct = struct;
 
-numParticipants = 29;
+numParticipants = 33;
 participantIDs = cell(1,numParticipants);
 numEmbryos = zeros(1,numParticipants);
 outcomeInfo = cell(1,numParticipants); % 
@@ -466,9 +466,10 @@ patientBMI(27) = 27.2;
 
 % EMECH-028
 % 8-19-16
+% had E3 transferred, no hCG rise
 participantIDs{28} = 'MECH028';
 numEmbryos(28) = 6;
-outcomeInfo{28} = [1 1 1 1 0 0];
+outcomeInfo{28} = [1 1 10 1 0 0];
 zygoteM{28} = NaN*ones(1,6);
 d3M{28} = {'8I', '9I', '7I', '8I', '', ''};
 blastM{28} = {'5BB', '5AB', '5BB', '5AB', '', ''};
@@ -512,19 +513,45 @@ patientBMI(30) = NaN;
 % 9-13-16
 participantIDs{31} = 'MECH031';
 numEmbryos(31) = 18;
-outcomeInfo{31} = 2*ones(1,18);
+outcomeInfo{31} = [1 1 0 1 1 1 1 0 0 1 0 1 0 0 0 1 0 1];
 zygoteM{31} = NaN*ones(1,18);
 d3M{31} = {'8II', '7II', '5II', '8I', '9I', '8I', '7I', '5III', '5II',...
            '6II', '6III', '8II', '9II', '8III', '9III', '9III', '7III', '4II'};
-blastM{31} = {'', '', '', '', '', '', '', '', '', ...
-              '', '', '', '', '', '', '', '', ''};
+blastM{31} = {'6BA', '4BB', '', '5BB', '5BB', '5BB', '6BB', '', '', ...
+              '6BA', '', '5BB', '', '', '', '5BC', '', '5BB'};
 ICSI{31} = zeros(1,18);
-PGD{31} = NaN*zeros(1,18);
-gender{31} = NaN*zeros(1,18);
+PGD{31} = [0 0 NaN 1 1 0 1 NaN NaN 1 NaN 1 NaN NaN NaN 1 NaN 1];
+gender{31} = [0 1 NaN 0 1 1 0 NaN NaN 0 NaN 1 NaN NaN NaN 0 NaN 0];
 patientAge(31) = 32;
 patientBMI(31) = 19.0;
 
+% EMECH-032
+% 9-15-16
+participantIDs{32} = 'MECH032';
+numEmbryos(32) = 5;
+outcomeInfo{32} = [0 1 0 1 1];
+zygoteM{32} = NaN*ones(1,5);
+d3M{32} = {'', '', '', '', ''};
+blastM{32} = {'', '5AA', '', '5BA', '4BC'};
+ICSI{32} = ones(1,5);
+PGD{32} = [NaN 1 NaN 1 0];
+gender{32} = [NaN 1 0 NaN 1];
+patientAge(32) = 38;
+patientBMI(32) = 19.85;
 
+% EMECH-033
+% 9-18-16
+participantIDs{33} = 'MECH033';
+numEmbryos(33) = 8;
+outcomeInfo{33} = [0 0 1 0 0 0 0 0];
+zygoteM{33} = NaN*ones(1,8);
+d3M{33} = {'6III', '4II', '9I', '8I', '9II', '3III', '8II', ''};
+blastM{33} = {'', '', '6BB', '', '', '', '', ''};
+ICSI{33} = zeros(1,8);
+PGD{33} = NaN*ones(1,8);
+gender{33} = NaN*ones(1,8);
+patientAge(33) = 43;
+patientBMI(33) = 38.01;
 
 
 outputStruct.numParticipants = numParticipants;

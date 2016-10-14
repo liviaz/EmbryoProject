@@ -7,19 +7,21 @@ function [paramsOut, fval] = KelvinVoigtOptimizeParams(tData, xData, startParams
 
 [paramsOut, fval, exitflag] = fminsearch(@(paramsIn)KelvinVoigtTestFit(tData, ...
     xData, F, paramsIn), startParams, ...
-    optimset('TolFun', 10^(-9), 'TolX', 10^(-5), 'MaxFunEvals', 1000))
-
-k = paramsOut(1);
-n = paramsOut(2);
-
-params = [F, k, n];
-options = odeset();
-
-% x(0) = 0;
-[tOut, xOut] = ode45( @(t,x)KelvinVoigtTest(t,x,params), tData, ...
-    0, options);
+    optimset('TolFun', 10^(-9), 'TolX', 10^(-5), 'MaxFunEvals', 1000));
 
 if (plotInput)
+    
+    k = paramsOut(1);
+    n = paramsOut(2);
+
+    params = [F, k, n];
+    options = odeset();
+
+    % x(0) = 0;
+    [tOut, xOut] = ode45( @(t,x)KelvinVoigtTest(t,x,params), tData, ...
+        0, options);
+
+
     figure(1);
     clf;
     plot(tData, 10^6*xData, 'Marker', 'o', 'LineStyle', 'none');

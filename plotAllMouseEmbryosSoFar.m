@@ -5,7 +5,7 @@
 clear all;
 %close all;
 
-filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo analysis\';
+filePath1 = 'C:\Users\Livia\Desktop\IVF\Processed Data\Mouse embryo\';
 
 % don't use auto plot for 11-19 or 11-30
 % whichToPlot(1) is 6-21-12 (fresh)

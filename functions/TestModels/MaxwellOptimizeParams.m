@@ -7,19 +7,21 @@ function [paramsOut, fval] = MaxwellOptimizeParams(tData, xData, startParams, F,
 
 [paramsOut, fval, exitflag] = fminsearch(@(paramsIn)MaxwellTestFit(tData, ...
     xData, F, paramsIn), startParams, ...
-    optimset('TolFun', 10^(-9), 'TolX', 10^(-4), 'MaxFunEvals', 1000))
-
-k = paramsOut(1);
-n = paramsOut(2);
-
-params = [F, n];
-options = odeset();
-
-% x(0) = F/k;
-[tOut, xOut] = ode45( @(t,x)MaxwellTest(t,x,params), tData, ...
-    F/k, options);
+    optimset('TolFun', 10^(-9), 'TolX', 10^(-4), 'MaxFunEvals', 1000));
 
 if (plotInput)
+
+    k = paramsOut(1);
+    n = paramsOut(2);
+
+    params = [F, n];
+    options = odeset();
+
+    % x(0) = F/k;
+    [tOut, xOut] = ode45( @(t,x)MaxwellTest(t,x,params), tData, ...
+        F/k, options);
+
+
     figure(1);
     clf;
     plot(tData, 10^6*xData, 'Marker', 'o', 'LineStyle', 'none');

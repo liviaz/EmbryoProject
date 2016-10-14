@@ -5,9 +5,9 @@
 clear all;
 warning off;
 close all;
-pNum = '019';
-date = '3-26-16';
-embryoNum = '5';
+pNum = '033';
+date = '9-18-16';
+embryoNum = '8';
 
 manualPip = 0;
 manualCorner = 0;
@@ -27,6 +27,7 @@ end
 
 fileNameSave = [filePathProc '\MECH' pNum '_E' embryoNum];
 movpath = [filePathRaw '\MECH' pNum '-E' embryoNum '.avi'];
+% movpath = [filePathRaw '\E' embryoNum '.avi'];
 
 % some parameters ...
 convFactor = 2.27; % pixels / micron on clinical system

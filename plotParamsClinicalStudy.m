@@ -40,7 +40,7 @@ bmiList = [];
 aText = [];
 cText = {};
 
-ptsToPlot = [ones(1,26) 1 1 1]; %[1 0 0 0 0 0 0 0 0 0 0 0 0];
+ptsToPlot = [ones(1,26) 1 1 1 1 1*ones(1,3)]; 
 
 
 % load in params by participant and embryo num
@@ -50,13 +50,14 @@ for i = 1:numParticipants
         
         for j = 1:numEmbryos(i)
 
+            j
             currE = currE + 1;
             currDataPath = [procDataPath participantIDs{i} '\' ...
                 participantIDs{i} '_E' num2str(j) '.mat'];
             ptList = [ptList i];
-
+            
             % save embryo params and color
-            if exist(currDataPath, 'file')  && (ICSI{i}(j) == 0) 
+            if exist(currDataPath, 'file')%  && (ICSI{i}(j) == 1) 
                 load(currDataPath);
                 mList = [mList outcomeInfo{i}(j)>0];
                 k0list = [k0list k0];
@@ -75,7 +76,7 @@ for i = 1:numParticipants
                 aList = [aList; aPad(1:65)];
                 ageList = [ageList patientAge(i)];
                 bmiList = [bmiList patientBMI(i)];
-                
+                1
                 % get day 3 morphology data
                 dayThreeM = d3M{i}{j};
                 if numel(dayThreeM) == 0
@@ -86,7 +87,7 @@ for i = 1:numParticipants
                     dayThreeM1 = [dayThreeM1 str2num(dayThreeM(1))];
                     dayThreeM2 = [dayThreeM2 getNumFromNumeral(dayThreeM(2:end))];
                 end
-                
+                2
                 % get day 5 morphology data
                 blastString = blastM{i}{j};
                 if numel(blastString) == 0
@@ -105,7 +106,8 @@ for i = 1:numParticipants
                 if ((blastStage(end) > 0) && (blastScore(end) < 1.6)) 
                     colorMat = [colorMat; [.2 .6 .9]];
                 elseif (blastStage(end) > 0)
-                    k1list(end) = NaN;
+%                     k1list(end) = NaN;
+%                     n1list(end) = NaN;
                     colorMat = [colorMat; [.85 .65 .2]];%[.9 .2 .8]];%
                 else
                     colorMat = [colorMat; [.85 .65 .2]];
@@ -116,21 +118,21 @@ for i = 1:numParticipants
 %                     colorMat(end,:) = [.8 .2 .8];
 %                 end
 %                 
-%                 % implantation/pregnancy color coding
-%                 if outcomeInfo{i}(j) == 10 % no hCG rise
-%                     mList(end) = 2;
-%                     colorMat(end,:) = [1 .3 .3];
-%                 end
-%                 
-%                 if outcomeInfo{i}(j) == 11 % hCG rise, no pregnancy
-%                     mList(end) = 3;
-%                     colorMat(end,:) = [.6 .2 1];
-%                 end
-%                 
-%                 if outcomeInfo{i}(j) == 12 % hCG rise, pregnancy
-%                     mList(end) = 4;
-%                     colorMat(end,:) = [.3 1 .3];
-%                 end
+                % implantation/pregnancy color coding
+                if outcomeInfo{i}(j) == 10 % no hCG rise
+                    mList(end) = 2;
+                    colorMat(end,:) = [1 .3 .3];
+                end
+                
+                if outcomeInfo{i}(j) == 11 % hCG rise, no pregnancy
+                    mList(end) = 3;
+                    colorMat(end,:) = [.6 .2 1];
+                end
+                
+                if outcomeInfo{i}(j) == 12 % hCG rise, pregnancy
+                    mList(end) = 4;
+                    colorMat(end,:) = [.3 1 .3];
+                end
 
                     % ICSI / IVF color coding
 %                     if ICSI{i}(j) == 1
@@ -250,12 +252,12 @@ end
 
 set(gca, 'FontSize', 14);
 grid on;
-axis([.3 .8 0.05 .8]);
+axis([.3 .8 0.05 .85]);
 xlabel('k_1 parameter');
 ylabel('\eta_1 parameter');
 
-legend([hLegend{1}, hLegend{2}], ...
-    {'Arrested', 'Blastocyst'}, 'Location', 'NorthEast');
+% legend([hLegend{1}, hLegend{2}], ...
+%     {'Arrested', 'Blastocyst'}, 'Location', 'NorthEast');
 
 
 dx = -0.01; dy = 0.015; dz = .5; % displacement so the text does not overlay the data points
@@ -270,25 +272,28 @@ currPt = 29;
 
 figure(2);
 clf;
-k11 = bar(1, mean(k1list(icsiList == 0)), .8, 'facecolor', [0 .6 .6]);
+k11 = bar(1, mean(k1list(icsiList == 0 & ~isnan(k1list))), .8, 'facecolor', [0 .6 .6]);
 hold on;
 % ek11 = errorbar(1, mean(k1list(icsiList == 0)),std(k1list(icsiList == 0)),'color', 'k', 'linewidth', 2);
-ek11 = terrorbar(1,mean(k1list(icsiList == 0)), std(k1list(icsiList == 0)), .1);
+ek11 = terrorbar(1,mean(k1list(icsiList == 0 & ~isnan(k1list))), ...
+    std(k1list(icsiList == 0 & ~isnan(k1list))), .1);
 set(ek11, 'color', 'k', 'linewidth', 2);
 
-k12 = bar(1.8, mean(k1list(icsiList == 1)), .8, 'facecolor',[.6 .9 .9] );
-ek12 = terrorbar(1.8, mean(k1list(icsiList == 1)),std(k1list(icsiList == 1)), .1);
+k12 = bar(1.8, mean(k1list(icsiList == 1 & ~isnan(k1list))), .8, 'facecolor',[.6 .9 .9] );
+ek12 = terrorbar(1.8, mean(k1list(icsiList == 1 & ~isnan(k1list))), ...
+    std(k1list(icsiList == 1 & ~isnan(k1list))), .1);
 set(ek12, 'color', 'k', 'linewidth', 2);
 
-n11 = bar(3.2, mean(n1list(icsiList == 0)), .8, 'facecolor', [1 .7 .2]);
-en11 = terrorbar(3.2, mean(n1list(icsiList == 0)),std(n1list(icsiList == 0)), .1);
+n11 = bar(3.2, mean(n1list(icsiList == 0 & ~isnan(k1list))), .8, 'facecolor', [1 .7 .2]);
+en11 = terrorbar(3.2, mean(n1list(icsiList == 0 & ~isnan(k1list))), ...
+    std(n1list(icsiList == 0 & ~isnan(k1list))), .1);
 set(en11, 'color', 'k', 'linewidth', 2);
 
-n12 = bar(4, mean(n1list(icsiList == 1)), .8, 'facecolor',[1 .9 .6]);
-en12 = terrorbar(4, mean(n1list(icsiList == 1)),std(n1list(icsiList == 1)), .1);
+n12 = bar(4, mean(n1list(icsiList == 1 & ~isnan(k1list))), .8, 'facecolor',[1 .9 .6]);
+en12 = terrorbar(4, mean(n1list(icsiList == 1 & ~isnan(k1list))), ...
+    std(n1list(icsiList == 1 & ~isnan(k1list))), .1);
 set(en12, 'color', 'k', 'linewidth', 2);
 
-set(gca, 'xtick', [1 2])
 set(gca, 'fontsize', 14);
 ylim([0 1]);
 set(gca, 'xtick', [1.4 3.6]);
@@ -358,9 +363,14 @@ e1 = terrorbar(.5,0.656,.025,.1);
 set(e1, 'color', 'k', 'linewidth', 2);
 
 % mechanics ROC
-h2 = bar(1.5, .829, .6, 'facecolor', [.3 .7 .8]);
-e2 = terrorbar(1.5,.829,.011,.1);
+h2 = bar(1.5, .811, .6, 'facecolor', [.3 .7 .8]);
+e2 = terrorbar(1.5,.811,.011,.1);
 set(e2, 'color', 'k', 'linewidth', 2);
+
+% combined ROC
+h3 = bar(2.5, .865, .6, 'facecolor', [.6 .3 .6]);
+e3 = terrorbar(2.5,.865,.014,.1);
+set(e3, 'color', 'k', 'linewidth', 2);
 
 % % day 3 morphology PR
 % h3 = bar(1.85, 0.599, .3, 'facecolor', [.8 .3 .3]);
@@ -378,7 +388,7 @@ set(gca, 'fontsize', 14);
 % set(gca, 'xticklabel', {'ROC', 'PR'});
 % ylabel('Area under curve');
 % title('Comparison of mechanics and day 3 morphology');
-xlim([0 2]);
+xlim([0 3]);
 grid on;
 
 %% 6. SVM figure plot
@@ -388,14 +398,14 @@ figure(1);
 % h = scatter(p1,p2,200,colorMat,'linewidth',4);
 hold on;
 
-axisLims = [.3 .8 .05 .8];
+axisLims = [.3 .8 .05 .85];
 embryoClassifier = fitcsvm([k1list; n1list]', mList == 1, 'ResponseName', ...
     'Viability', 'KernelFunction', 'rbf', 'KernelScale', 1, 'standardize', true);
 [x1Grid,x2Grid] = meshgrid(linspace(axisLims(1),axisLims(2),100),...
     linspace(axisLims(3),axisLims(4),100));
 xGrid = [x1Grid(:),x2Grid(:)];
 [~,scores] = predict(embryoClassifier,xGrid);
-[c, hh] = contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),-.5*[1 1],'k', 'linewidth', 2);
+[c, hh] = contour(x1Grid,x2Grid,reshape(scores(:,2),size(x1Grid)),-.1*[1 1],'k', 'linewidth', 2);
 
 axis([.38 .81 0 .75]);
 
@@ -541,13 +551,53 @@ end
 % view(0,90);
 axis([.25 .8 .05 .75]);
 
+%% Plot ROC curves for mech vs morphology
+
+figure(1); clf;
+set(gca, 'FontSize', 14);
+hold on;
+
+% mech
+h1 = plot([X1 1], [Y1 1], 'Color', [.3 .7 .8], 'LineWidth', 2);
+
+% day 3 morphology
+h2 = plot([X2 1], [Y2 1], 'Color', [.8 .3 .3], 'LineWidth', 2);
+
+% optimal combination
+h3 = plot([X3 1], [Y3 1], 'Color', [.6 .3 .6], 'LineWidth', 2);
+
+plot([0 1], [0 1], 'color', .3*ones(1,3), 'linestyle', '--', 'linewidth', 2);
+
+xlabel('1 - Specificity'); ylabel('Sensitivity')
+title('');
+grid on;
+axis([0 1 0 1]);
+legend([h1 h2 h3], {'Mechanics', 'Morphology', 'Both'})
+
+save('clinicalROCdata.mat', 'X1', 'X2', 'X3', 'Y1', 'Y2', 'Y3', ...
+    'AUC1', 'AUC2', 'AUC3');
+
+% Mech only: sens 79%, spec 70%, ppv 72%, acc 74%, AUC 0.81
+% Morph only: sens 68%, spec 59%, ppv 61%, acc 63%, AUC 0.66
+% both: sens 77%, spec 79%, ppv 78%, acc 78%, AUC 0.86
 
 
 
+%% Mech feature selection plot
 
 
 
+figure(1); clf;
+set(gca, 'FontSize', 14);
+hold on;
 
+plot([1 2 3 4], [AUC1, AUC2, AUC3, AUC4], 'color', [0 0 1], 'linewidth', 2);
+
+
+xlabel('number of parameters'); ylabel('AUC_R_O_C')
+title('');
+grid on;
+axis([1 4 .5 1]);
 
 
 

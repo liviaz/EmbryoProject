@@ -19,7 +19,7 @@
 % ground truth
 
 
-function [AUC_ROC, AUC_PR, zSVM, aROCstd, aPRstd, Ytotal, Ztotal, decDistTest] = ...
+function [AUC_ROC, AUC_PR, zSVM, aROCstd, aPRstd, Xref, Ytotal, Ztotal, decDistTest] = ...
     classifyEmbryos(inputMethod, nGroups, method, paramNumsToUse, numRepeats, plotInput)
 
 close all;
@@ -139,7 +139,7 @@ for j = 1:numRepeats
         [~, decDistTest, ~] = classifyExisting(paramsOut, mOut, ...
             fig_handle, plotInput);
         
-        pOut = ((sign(decDistTest+.5)+1)/2)';
+        pOut = ((sign(decDistTest+.0)+1)/2)';
         matchOut = (mOut == pOut);
         
         sensList = [sensList, sum(mOut == 1 & matchOut == 1)/sum(mOut)];

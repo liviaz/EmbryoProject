@@ -80,7 +80,7 @@ for i = 1:numParticipants
                 participantIDs{i} '_E' num2str(j) '.mat'];
             
             % save embryo params and color
-            if exist(currDataPath, 'file') && (ICSI{i}(j) == 1)
+            if exist(currDataPath, 'file')% && (ICSI{i}(j) == 1)
                 load(currDataPath);
                 mList = [mList outcomeInfo{i}(j)];
                 k0list = [k0list k0];
